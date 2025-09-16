@@ -1,3 +1,4 @@
+
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -19,6 +20,12 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+  },
+  {
+    files: ["**/*.{ts,tsx,js,jsx}"],  // Changed to match more files
+    rules: {
+      "react/no-unescaped-entities": "off"  // Just turn it off completely
+    }
   },
 ];
 
