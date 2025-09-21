@@ -1,6 +1,6 @@
 const mockCoverLetters = [
   {
-    id: 1,
+    id: "1",
     jobTitle: "Senior Frontend Developer",
     company: "TechCorp Inc.",
     dateGenerated: "2024-03-15",
@@ -28,7 +28,7 @@ Sincerely,
 John Doe`,
   },
   {
-    id: 2,
+    id: "2",
     jobTitle: "Digital Marketing Manager",
     company: "Growth Labs",
     dateGenerated: "2024-03-14",
@@ -58,7 +58,7 @@ Best regards,
 Sarah Johnson`,
   },
   {
-    id: 3,
+    id: "3",
     jobTitle: "Product Manager",
     company: "Innovation Co",
     dateGenerated: "2024-03-13",
@@ -91,21 +91,21 @@ John Doe`,
 
 const mockAnalyses = [
   {
-    id: 1,
+    id: "1",
     jobTitle: "Senior Frontend Developer",
     company: "TechCorp Inc.",
     resumeName: "John_Doe_Resume.pdf",
     matchScore: 85,
   },
   {
-    id: 2,
+    id: "2",
     jobTitle: "Digital Marketing Manager",
     company: "Growth Labs",
     resumeName: "Marketing_Resume_2024.pdf",
     matchScore: 72,
   },
   {
-    id: 3,
+    id: "3",
     jobTitle: "DevOps Engineer",
     company: "CloudFirst Solutions",
     resumeName: "Senior_Developer_Resume.docx",
@@ -113,4 +113,11 @@ const mockAnalyses = [
   },
 ];
 
-export { mockCoverLetters, mockAnalyses };
+// Mock data
+const mockResumes = [
+  { id: 1, name: "John_Doe_Resume.pdf" },
+  { id: 2, name: "Senior_Developer_Resume.docx" },
+  { id: 3, name: "Marketing_Resume_2024.pdf" },
+];
+
+export { mockCoverLetters, mockAnalyses, mockResumes };

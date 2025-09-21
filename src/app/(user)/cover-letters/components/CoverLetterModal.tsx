@@ -4,8 +4,17 @@ import { FileText, Copy, Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { coverLetterType } from "./types";
 // Cover Letter View/Edit Modal
-const CoverLetterModal = ({ coverLetter, isOpen, onOpenChange }) => {
+const CoverLetterModal = ({
+  coverLetter,
+  isOpen,
+  onOpenChange,
+}: {
+  coverLetter: coverLetterType;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => {
   if (!coverLetter) return null;
 
   const handleCopy = async () => {
@@ -13,7 +22,7 @@ const CoverLetterModal = ({ coverLetter, isOpen, onOpenChange }) => {
       await navigator.clipboard.writeText(coverLetter.fullText);
       toast.success("Cover letter text has been copied successfully.");
     } catch (err) {
-      toast.error("Failed to copy text to clipboard.");
+      toast.error("Failed to copy text to clipboard.", err as undefined);
     }
   };
 

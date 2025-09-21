@@ -7,19 +7,21 @@ import CoverLetterCard from "./CoverLetterCard";
 import CoverLetterModal from "./CoverLetterModal";
 import { mockCoverLetters } from "./mocks";
 import CoverLetterEmptyState from "./CoverLetterEmpty";
+import { coverLetterType } from "./types";
 
 // Main Cover Letters Page Component
 export default function CoverLettersPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedCoverLetter, setSelectedCoverLetter] = useState(null);
+  const [selectedCoverLetter, setSelectedCoverLetter] =
+    useState<coverLetterType | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
 
-  const handleView = (coverLetter) => {
+  const handleView = (coverLetter: coverLetterType) => {
     setSelectedCoverLetter(coverLetter);
     setIsViewOpen(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
     // Placeholder for delete functionality
     console.log("Delete cover letter:", id);
   };
@@ -68,11 +70,13 @@ export default function CoverLettersPage() {
 
         {/* Modals */}
         <CoverLetterForm isOpen={isFormOpen} onOpenChange={setIsFormOpen} />
-        <CoverLetterModal
-          coverLetter={selectedCoverLetter}
-          isOpen={isViewOpen}
-          onOpenChange={setIsViewOpen}
-        />
+        {selectedCoverLetter && (
+          <CoverLetterModal
+            coverLetter={selectedCoverLetter}
+            isOpen={isViewOpen}
+            onOpenChange={setIsViewOpen}
+          />
+        )}
       </div>
     </div>
   );

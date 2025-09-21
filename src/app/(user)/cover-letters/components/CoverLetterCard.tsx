@@ -18,9 +18,18 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-// Cover Letter Card Component
-const CoverLetterCard = ({ coverLetter, onView, onDelete }) => {
-  const getStatusColor = (status) => {
+import { coverLetterType } from "./types";
+
+const CoverLetterCard = ({
+  coverLetter,
+  onView,
+  onDelete,
+}: {
+  coverLetter: coverLetterType;
+  onView: (letter: coverLetterType) => void;
+  onDelete: (id: string) => void;
+}) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "Finalized":
         return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
@@ -35,7 +44,7 @@ const CoverLetterCard = ({ coverLetter, onView, onDelete }) => {
     try {
       await navigator.clipboard.writeText(coverLetter.fullText);
       toast.success("Cover letter text has been copied successfully.");
-    } catch (err) {
+    } catch {
       toast.error("Failed to copy text to clipboard.");
     }
   };

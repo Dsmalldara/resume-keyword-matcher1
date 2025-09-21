@@ -18,17 +18,15 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { FileText, Mail, Building } from "lucide-react";
-import { mockAnalyses } from "./mocks";
+import { mockAnalyses, mockResumes } from "./mocks";
 
-// Mock data
-const mockResumes = [
-  { id: 1, name: "John_Doe_Resume.pdf" },
-  { id: 2, name: "Senior_Developer_Resume.docx" },
-  { id: 3, name: "Marketing_Resume_2024.pdf" },
-];
-
-// Cover Letter Form Component
-const CoverLetterForm = ({ isOpen, onOpenChange }) => {
+const CoverLetterForm = ({
+  isOpen,
+  onOpenChange,
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => {
   const [selectedResume, setSelectedResume] = useState("");
   const [selectedAnalysis, setSelectedAnalysis] = useState("");
   const [customNotes, setCustomNotes] = useState("");
