@@ -32,11 +32,6 @@ const items = [
     icon: FileText,
   },
   {
-    title: "Job Descriptions",
-    url: "/jobs",
-    icon: Briefcase,
-  },
-  {
     title: "Analysis",
     url: "/analysis",
     icon: BarChart2,
