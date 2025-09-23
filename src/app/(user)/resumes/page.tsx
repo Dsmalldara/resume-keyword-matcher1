@@ -1,6 +1,6 @@
 import { generateMetadata } from "@/lib/generate-metadata";
 import { Metadata } from "next/types";
-import ResumePage from "./ResumePage";
+import ResumePage from "./components/ResumePage";
 
 export const metadata: Metadata = generateMetadata({
   title: "Resumes",

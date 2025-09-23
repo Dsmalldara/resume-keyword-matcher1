@@ -8,16 +8,15 @@ interface Analysis {
   gaps: string[];
   nextSteps: string;
 }
-
-interface AnalysisModalProps {
-  analysis: Analysis | null;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
 interface AnalysisResult extends Analysis {
   id: number;
   dateAnalyzed: string;
   status: "Strong" | "Moderate" | "Weak";
+}
+interface AnalysisModalProps {
+  analysis: Analysis | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export type { Analysis, AnalysisModalProps, AnalysisResult };

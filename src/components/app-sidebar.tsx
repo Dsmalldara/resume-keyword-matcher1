@@ -1,12 +1,4 @@
-import {
-  Home,
-  FileText,
-  Briefcase,
-  BarChart2,
-  PenLine,
-  History,
-  Settings,
-} from "lucide-react";
+import { Home, FileText, BarChart2, PenLine, Settings } from "lucide-react";
 
 import {
   Sidebar,
@@ -22,8 +14,8 @@ import {
 // Menu items for Resume Analyzer Dashboard
 const items = [
   {
-    title: "Dashboard",
-    url: "/",
+    title: "Home",
+    url: "/Home",
     icon: Home,
   },
   {
@@ -40,11 +32,6 @@ const items = [
     title: "Cover Letters",
     url: "/cover-letters",
     icon: PenLine,
-  },
-  {
-    title: "History",
-    url: "/history",
-    icon: History,
   },
   {
     title: "Settings",

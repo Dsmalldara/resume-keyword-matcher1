@@ -15,32 +15,21 @@ import {
   Eye,
   Mail,
 } from "lucide-react";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { CircularProgress } from "./AnalysisForm";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AnalysisResult } from "./AnalysisTypes";
 
-// Analysis Card Component
-interface Analysis {
-  resumeName: string;
-  jobTitle: string;
-  company: string;
-  dateAnalyzed: string;
-  matchScore: number;
-  status: "Strong" | "Moderate" | "Weak";
-  summary: string;
-  strengths: string[];
-  gaps: string[];
-}
 const AnalysisCard = ({
   analysis,
-  onViewDetails,
   setSelectedAnalysis,
   setIsDetailsOpen,
 }: {
-  analysis: Analysis;
-  onViewDetails: (analysis: Analysis) => void;
-  setSelectedAnalysis: (analysis: Analysis) => Analysis | null;
+  analysis: AnalysisResult;
+  setSelectedAnalysis: (
+    analysis: SetStateAction<AnalysisResult | null>,
+  ) => void;
   setIsDetailsOpen: (isOpen: boolean) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);

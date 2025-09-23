@@ -1,18 +1,14 @@
 import { generateMetadata } from "@/lib/generate-metadata";
-import HomePage from "./Home/components/HomePage";
-import type { Metadata } from "next";
+import { Metadata } from "next/dist/lib/metadata/types/metadata-interface";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = generateMetadata({
   title: "Home",
   description:
     "Track your resume optimization progress and job matching insights",
 });
-
-function HomePageComp() {
-  return (
-    <div>
-      <HomePage />
-    </div>
-  );
+function page() {
+  redirect("/");
 }
-export default HomePageComp;
+
+export default page;

@@ -15,6 +15,7 @@ const CoverLetterEmptyState = ({
       Generate personalized cover letters from your analyses to make stronger
       job applications.
     </p>
+    s{" "}
     <Button size="lg" onClick={() => onGenerate(true)}>
       <Plus className="w-4 h-4 mr-2" />
       Generate your first cover letter

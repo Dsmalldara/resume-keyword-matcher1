@@ -9,11 +9,11 @@ export const metadata: Metadata = generateMetadata({
     "In-depth resume analysis and job matching insights to optimize your applications",
 });
 
-function DashboardPage() {
+function AnalysisPageComp() {
   return (
     <div>
       <AnalysisPage />
     </div>
   );
 }
-export default DashboardPage;
+export default AnalysisPageComp;

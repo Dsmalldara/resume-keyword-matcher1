@@ -7,13 +7,12 @@ import AnalysisModal from "./AnalysisModal";
 import { AnalysisEmptyState } from "./AnalysisEmptyState";
 import { mockAnalyses } from "./mocks";
 import { Button } from "@/components/ui/button";
-import type { Analysis } from "./AnalysisTypes";
+import type { AnalysisResult } from "./AnalysisTypes";
 
 export default function AnalysisPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(
-    null,
-  );
+  const [selectedAnalysis, setSelectedAnalysis] =
+    useState<AnalysisResult | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   console.log("Selected Analysis:", selectedAnalysis);
@@ -52,7 +51,9 @@ export default function AnalysisPage() {
               <AnalysisCard
                 key={analysis.id}
                 analysis={analysis}
-                setSelectedAnalysis={setSelectedAnalysis}
+                setSelectedAnalysis={(analysis) =>
+                  setSelectedAnalysis(analysis)
+                }
                 setIsDetailsOpen={setIsDetailsOpen}
               />
             ))}
