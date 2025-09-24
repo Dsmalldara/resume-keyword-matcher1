@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { coverLetterType } from "./types";
+import { Copyable } from "@/components/copy-able";
 
 const CoverLetterCard = ({
   coverLetter,
@@ -103,8 +104,7 @@ const CoverLetterCard = ({
           View
         </Button>
         <Button variant="outline" size="sm" onClick={handleCopy}>
-          <Copy className="w-4 h-4 mr-2" />
-          Copy
+          <Copyable value={coverLetter.fullText} showText />
         </Button>
         <Button variant="outline" size="sm" onClick={handleDownload}>
           <Download className="w-4 h-4 mr-2" />

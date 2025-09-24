@@ -32,7 +32,7 @@ export default function ResumePage() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-auto">
           {/* Upload Section */}
           <div className="lg:col-span-4">
             <UploadResumeCard />
