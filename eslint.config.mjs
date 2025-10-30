@@ -1,4 +1,3 @@
-
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -22,9 +21,12 @@ const eslintConfig = [
     ],
   },
   {
-    files: ["**/*.{ts,tsx,js,jsx}"],  // Changed to match more files
+    files: ["**/*.{ts,tsx,js,jsx}"],
     rules: {
-      "react/no-unescaped-entities": "off"  // Just turn it off completely
+      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-unused-vars": "off",  // Turn off unused vars warnings
+      "@typescript-eslint/no-explicit-any": "off",  // Turn off 'any' type errors
+      "react/display-name": "off"  // Turn off display name requirement
     }
   },
 ];

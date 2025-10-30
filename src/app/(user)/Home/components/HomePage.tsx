@@ -19,6 +19,7 @@ import ScoreCard from "./ScoreCard";
 import ResumeContentGrid from "../../resumes/components/ResumeContentGrid";
 import ResumeItem from "../../resumes/components/ResumeItem";
 import { recentActivities, stats } from "./mocks";
+import FileUploader from "./FileUploader";
 
 export default function HomePage() {
   return (
@@ -107,10 +108,7 @@ export default function HomePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200 h-12">
-                <Upload className="w-4 h-4 mr-2 text-white" />
-                <p className="text-white ">Upload New Resume</p>
-              </Button>
+              <FileUploader />
               <Button
                 variant="outline"
                 className="w-full border-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 h-12"

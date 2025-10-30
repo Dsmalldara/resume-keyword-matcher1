@@ -7,6 +7,7 @@ import ResumeTable from "./ResumeTable";
 import MobileResumeCards from "./MobileResumeCards";
 import EmptyState from "./EmptyState";
 import UploadResumeCard from "./UploadResumeCard";
+import FileUploader from "../../Home/components/FileUploader";
 
 export default function ResumePage() {
   const resumes = [
@@ -35,7 +36,11 @@ export default function ResumePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-auto">
           {/* Upload Section */}
           <div className="lg:col-span-4">
-            <UploadResumeCard />
+            <Card className="h-fit">
+              <CardContent className="p-[1.6rem]">
+                <FileUploader />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Resume List Section */}
