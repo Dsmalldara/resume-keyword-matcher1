@@ -1,0 +1,255 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enums for type safety
+enum JobStatus {
+  PENDING
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+enum AnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum CoverLetterStatus {
+  DRAFT
+  COMPLETED
+  ARCHIVED
+}
+
+enum ActivityType {
+  RESUME_UPLOAD
+  RESUME_UPDATE
+  RESUME_DELETE
+  JOB_ADD
+  JOB_UPDATE
+  JOB_DELETE
+  ANALYSIS_CREATE
+  ANALYSIS_COMPLETE
+  COVER_LETTER_GENERATE
+  COVER_LETTER_UPDATE
+}
+
+enum SubscriptionTier {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+
+model Profile {
+  id          String   @id @db.Uuid
+  userId      String   @unique  
+  email       String   @unique
+  username    String? 
+  displayName String?
+  bio         String?
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime? // Soft delete
+  storageKey String @unique @default(uuid())
+
+
+  // Relations (keep these)
+  resumes         Resume[]
+  jobDescriptions JobDescription[]
+  analyses        Analysis[]
+  coverLetters    CoverLetter[]
+  activities      ActivityLog[]
+  usageQuota      UsageQuota?
+
+  @@index([email])
+  @@index([deletedAt])
+  @@map("profiles")
+}
+
+
+model UsageQuota {
+  id                    String           @id @default(cuid())
+  profileId             String           @unique @db.Uuid
+  profile               Profile          @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // Subscription
+  tier                  SubscriptionTier @default(FREE)
+  
+  // Resume limits
+  resumesUsed           Int              @default(0)
+  resumesLimit          Int              @default(3) // FREE: 3, PRO: 10, ENTERPRISE: unlimited
+  
+  // Analysis limits
+  analysesUsed          Int              @default(0)
+  analysesLimit         Int              @default(5) // FREE: 5/month, PRO: 50/month, ENTERPRISE: unlimited
+  analysesResetAt       DateTime         @default(now())
+  
+  // Cover letter limits
+  coverLettersUsed      Int              @default(0)
+  coverLettersLimit     Int              @default(5) // FREE: 5/month, PRO: 50/month, ENTERPRISE: unlimited
+  coverLettersResetAt   DateTime         @default(now())
+  
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  
+  @@index([profileId])
+  @@map("usage_quotas")
+}
+
+model Resume {
+  id          String    @id @default(cuid())
+  storageKey  String 
+  profileId    String  @db.Uuid
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name        String
+  fileUrl     String
+  fileSize    BigInt
+  version     Int       @default(1) // Version tracking
+  isActive    Boolean   @default(true) // Track which resume is currently active
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // Soft delete
+  
+  // Relations
+  analyses      Analysis[]
+  coverLetters  CoverLetter[]
+  versions      ResumeVersion[]
+  
+  @@index([profileId, deletedAt])
+  @@index([profileId, isActive])
+  @@map("resumes")
+}
+
+model ResumeVersion {
+  id        String   @id @default(cuid())
+  resumeId  String
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  version   Int
+  name      String
+  fileUrl   String
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid // profileId who created this version
+  
+  @@unique([resumeId, version])
+  @@index([resumeId])
+  @@map("resume_versions")
+}
+
+model JobDescription {
+  id          String     @id @default(cuid())
+  profileId   String     @db.Uuid
+  profile     Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title       String
+  company     String?
+  description String
+  status      JobStatus  @default(PENDING)
+  dateAdded   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?  // Soft delete
+  
+  // Relations
+  analyses     Analysis[]
+  coverLetters CoverLetter[]
+  
+  @@index([profileId, deletedAt])
+  @@index([profileId, status])
+  @@map("job_descriptions")
+}
+
+model Analysis {
+  id           String         @id @default(cuid())
+  profileId    String         @db.Uuid
+  profile      Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  resumeId     String
+  resume       Resume         @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jobId        String
+  job          JobDescription @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  matchScore   Int
+  status       AnalysisStatus @default(PENDING)
+  summary      String
+  strengths    String[]
+  gaps         String[]
+  nextSteps    String
+  dateAnalyzed DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?      // Soft delete
+  
+  // Relations
+  coverLetters CoverLetter[]
+  
+  @@index([profileId, deletedAt])
+  @@index([resumeId])
+  @@index([jobId])
+  @@index([status])
+  @@map("analyses")
+}
+
+model CoverLetter {
+  id            String              @id @default(cuid())
+  profileId     String              @db.Uuid
+  profile       Profile             @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  resumeId      String
+  resume        Resume              @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jobId         String
+  job           JobDescription      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  analysisId    String
+  analysis      Analysis            @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  status        CoverLetterStatus   @default(DRAFT)
+  preview       String
+  fullText      String
+  customNotes   String?
+  version       Int                 @default(1) // Version tracking
+  dateGenerated DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  deletedAt     DateTime?           // Soft delete
+  
+  // Relations
+  versions      CoverLetterVersion[]
+  
+  @@index([profileId, deletedAt])
+  @@index([resumeId])
+  @@index([jobId])
+  @@index([status])
+  @@map("cover_letters")
+}
+
+model CoverLetterVersion {
+  id             String       @id @default(cuid())
+  coverLetterId  String
+  coverLetter    CoverLetter  @relation(fields: [coverLetterId], references: [id], onDelete: Cascade)
+  version        Int
+  fullText       String
+  customNotes    String?
+  createdAt      DateTime     @default(now())
+  createdBy      String       @db.Uuid // profileId who created this version
+  
+  @@unique([coverLetterId, version])
+  @@index([coverLetterId])
+  @@map("cover_letter_versions")
+}
+
+model ActivityLog {
+  id         String       @id @default(cuid())
+  profileId  String       @db.Uuid
+  profile    Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  type       ActivityType
+  entityId   String
+  entityType String
+  message    String
+  metadata   Json?        // Store additional context
+  createdAt  DateTime     @default(now())
+  
+  @@index([profileId, createdAt])
+  @@index([type])
+  @@map("activity_logs")
+}
