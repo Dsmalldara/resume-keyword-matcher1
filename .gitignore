@@ -119,3 +119,9 @@ Thumbs.db
 # Prisma
 # Keep prisma/schema.prisma but ignore generated files
 prisma/migrations/*/migration.sql
+
+
+# Winston logs
+logs/
+*.log
+.delete-user.ts
