@@ -6,7 +6,7 @@
     "strict": true,
     "moduleResolution": "node",
     "noEmit": true,
-    "types": ["deno.ns"],
+    "types": ["node"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true 
   }
