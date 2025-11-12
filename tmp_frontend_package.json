@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "resume-keyword-matcher",
   "version": "0.1.0",
   "private": true,
@@ -7,8 +7,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "generate:api": "orval",
-       "prepare": "cd .. && husky || true" 
+    "prepare": "husky install",
+    "generate:api": "orval"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -62,6 +62,7 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^8.0.0",
     "jest": "^30.1.3",
     "lint-staged": "^16.1.6",
     "orval": "^7.15.0",
@@ -69,13 +70,13 @@
     "tailwindcss": "^4",
     "ts-jest": "^29.4.2",
     "tw-animate-css": "^1.3.8",
-    "typescript": "^5",
-      "husky": "^8.0.0"
+    "typescript": "^5"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix",
       "prettier --write"
     ]
-  }
+  },
+  "husky": {}
 }
