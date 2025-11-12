@@ -9,4 +9,9 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true 
   }
+   "exclude": [
+    "node_modules",
+    "dist",
+    "supabase"
+  ]
 }
