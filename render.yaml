@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: resume-keyword-matcher-backend
+    env: node
+    buildCommand: pnpm install && pnpm prisma:generate:prod && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
