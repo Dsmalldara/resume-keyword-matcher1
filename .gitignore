@@ -72,3 +72,4 @@ next-env.d.ts
 .cache/
 tmp/
 temp/node_modules/
+backend/test.ts
