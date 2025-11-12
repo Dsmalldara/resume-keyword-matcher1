@@ -16,7 +16,7 @@
     "prisma:migrate:resolve:dev": "dotenv -e .env.development.local -- pnpm prisma migrate resolve --applied 20251030123000_baseline",
     "build": "tsc",
   "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --ext .ts,.tsx,.js,.jsx",
-   "start": "node dist/src/server.js"
+   "start": "node dist/src/server.js",
     "generate:openapi": "node ./scripts/generate-openapi.cjs",
     "generate:types": "npx openapi-typescript ./public/openapi.json --output ./src/types/api.ts",
     "prepush:check": "pnpm generate:openapi && pnpm generate:types && git diff --exit-code || (echo 'Generated API artifacts out of date' && exit 1)",
