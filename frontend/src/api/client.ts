@@ -8,9 +8,16 @@ const AXIOS_INSTANCE = axios.create({
 
 export const storeAccessToken = (newToken: string) => {
   if (typeof window !== "undefined") {
+    // Store in sessionStorage for client-side access
     sessionStorage.setItem("access_token", newToken);
+
+    // Also store in a cookie for server-side middleware validation
+    document.cookie = `access_token=${newToken}; path=/; ${
+      process.env.NODE_ENV === "production" ? "Secure;" : ""
+    } SameSite=Lax`;
   }
 };
+
 export const getAccessToken = () => {
   if (typeof window !== "undefined") {
     return sessionStorage.getItem("access_token");
@@ -51,7 +58,7 @@ AXIOS_INSTANCE.interceptors.response.use(
           `Bearer ${data.access_token}`;
         return AXIOS_INSTANCE(originalRequest);
       } catch (refreshError) {
-        redirect('/auth/login');
+        redirect("/auth/login");
         return Promise.reject(refreshError);
       }
     }
