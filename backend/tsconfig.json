@@ -4,7 +4,6 @@
     "module": "commonjs",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "outDir": "./dist",
-    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -13,10 +12,11 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "swagger.config.ts", "*.ts"],
   "exclude": [
     "node_modules",
     "dist",
-    "supabase"
+    "supabase",
+    "delete-user.ts"
   ]
 }
