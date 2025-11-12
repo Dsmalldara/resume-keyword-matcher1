@@ -9,4 +9,9 @@
 export interface Error {
   /** Error message */
   error?: string;
+  /**
+   * Additional information about the error
+   * @nullable
+   */
+  details?: string | null;
 }

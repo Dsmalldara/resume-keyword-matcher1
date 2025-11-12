@@ -32,12 +32,7 @@ const items = [
     title: "Cover Letters",
     url: "/cover-letters",
     icon: PenLine,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
+  }
 ];
 
 export function AppSidebar() {

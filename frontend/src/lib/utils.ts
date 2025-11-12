@@ -1,3 +1,4 @@
+import { useFetchResumes } from "@/app/(user)/Home/queries/resumeQuery";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -17,3 +18,34 @@ export const getErrorMessage = (error: any): string => {
     ? errorMessage
     : JSON.stringify(errorMessage);
 };
+
+
+type queryKeysType ={
+  activity: string;
+    resume: string;
+    job: string;
+    profile: string;
+    insights: string;
+    analysis: ('best-match' | 'improvement' | 'jobs-analyzed')[];
+    coverletters: ('coverletters-list' | 'coverletter-detail')[];
+}
+
+export const queryKeys:queryKeysType = {
+  activity: 'activity',
+  resume: 'resume',
+  job: 'job',
+  profile: 'profile',
+  insights: `insights`,
+  analysis:[
+    'best-match',
+    'improvement',
+    'jobs-analyzed'
+  ],
+  coverletters:[
+    'coverletters-list',
+    'coverletter-detail'
+  ]
+
+};
+
+

@@ -1,7 +1,9 @@
-import supabase from "../lib/supabase";
+import { Router } from "express";
+import {supabase} from "../lib/supabase";
 import { AuthMiddleware } from "../middleware/auth";
-import router from "./auth.routes";
 
+
+const router = Router()
 router.get("/test-storage", AuthMiddleware, async (req, res) => {
   try {
     const userId = req.user?.id;

@@ -1,21 +1,34 @@
 "use client";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import AnalysisCard from "./AnalysisCard";
-import { AnalysisForm } from "./AnalysisForm";
+import AnalysisCards from "./AnalysisCard";
+import AnalysisForm from "./AnalysisForm";
 import AnalysisModal from "./AnalysisModal";
 import { AnalysisEmptyState } from "./AnalysisEmptyState";
-import { mockAnalyses } from "./mocks";
 import { Button } from "@/components/ui/button";
-import type { AnalysisResult } from "./AnalysisTypes";
+import { GetAnalysisGetAnalysis200DataItem } from "@/api/models";
+import { useGetAllAnalysisQuery } from "../Queries/getAllAnalysisQuery";
+import { AnalysisCardSkeleton } from "./AnalysisCardSkeleton";
+import Pagination from "@/components/ui/pagination";
 
 export default function AnalysisPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedAnalysis, setSelectedAnalysis] =
-    useState<AnalysisResult | null>(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedAnalysis, setSelectedAnalysis] = useState<GetAnalysisGetAnalysis200DataItem | null>(null);
+  const [paginationState, setPaginationState] = useState({
+    page: 1,
+    perPage: 10,
+  });
 
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  
+  const { data: analysisInfo, isLoading, error } = useGetAllAnalysisQuery(paginationState);
+  
   console.log("Selected Analysis:", selectedAnalysis);
+  console.log(analysisInfo);
+
+  const analysisData = analysisInfo?.data
+  const totalPages = analysisInfo?.pagination?.totalPages || 1
+
   const handleRunAnalysis = () => {
     setIsFormOpen(true);
   };
@@ -42,21 +55,34 @@ export default function AnalysisPage() {
           </Button>
         </div>
 
-        {/* Main Content */}
-        {mockAnalyses.length === 0 ? (
+       <div>
+        
+        {isLoading && (
+         
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+             <AnalysisCardSkeleton />
+             <AnalysisCardSkeleton />
+             <AnalysisCardSkeleton />
+           </div>
+         )}
+       </div>
+       
+        {!isLoading && (!analysisData || analysisData.length === 0) ? (
           <AnalysisEmptyState onRunAnalysis={handleRunAnalysis} />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {mockAnalyses.map((analysis) => (
-              <AnalysisCard
-                key={analysis.id}
-                analysis={analysis}
-                setSelectedAnalysis={(analysis) =>
-                  setSelectedAnalysis(analysis)
-                }
-                setIsDetailsOpen={setIsDetailsOpen}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:grid-cols-2 ">
+            <AnalysisCards
+              analysisData={analysisData}
+              setSelectedAnalysis={setSelectedAnalysis}
+              setIsDetailsOpen={setIsDetailsOpen}
+            />
+            
+
+               <Pagination
+                currentPage={paginationState.page ?? 1}
+                totalPages={totalPages}
+                onPageChange={(page) => setPaginationState((s) => ({ ...(s || {}), page }))}
               />
-            ))}
           </div>
         )}
 

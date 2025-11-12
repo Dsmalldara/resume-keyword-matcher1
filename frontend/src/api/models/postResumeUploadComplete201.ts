@@ -5,9 +5,7 @@
  * Backend API for AI-powered resume analysis. Matches CVs against job descriptions, identifies missing keywords, calculates compatibility scores, and generates personalized cover letter suggestions. Built with Node.js/Express.
  * OpenAPI spec version: 1.0.0
  */
-import type { Resume } from "./resume";
 
 export type PostResumeUploadComplete201 = {
   message?: string;
-  resume?: Resume;
 };

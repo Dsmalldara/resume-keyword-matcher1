@@ -5,16 +5,32 @@
  * Backend API for AI-powered resume analysis. Matches CVs against job descriptions, identifies missing keywords, calculates compatibility scores, and generates personalized cover letter suggestions. Built with Node.js/Express.
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult,
 } from "@tanstack/react-query";
 
 import type {
+  DeleteResumeDeleteResumeId200,
+  DeleteResumeDeleteResumeId403,
+  DeleteResumeDeleteResumeId404,
+  DeleteResumeDeleteResumeId500,
   Error,
+  GetResumeListGetResume200,
+  GetResumeListGetResume400,
+  GetResumeListGetResume500,
+  GetResumeListGetResumeParams,
   PostResumeUploadComplete201,
   PostResumeUploadComplete400,
   PostResumeUploadCompleteBody,
@@ -30,100 +46,6 @@ import { customInstance } from "../../client";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-/**
- * Creates a presigned URL for uploading a resume file to Supabase storage
- * @summary Generate a presigned upload URL
- */
-export const postResumeUploadPresign = (
-  postResumeUploadPresignBody: PostResumeUploadPresignBody,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<PostResumeUploadPresign200>(
-    {
-      url: `/resume/upload/presign`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: postResumeUploadPresignBody,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostResumeUploadPresignMutationOptions = <
-  TError = PostResumeUploadPresign400 | Error,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postResumeUploadPresign>>,
-    TError,
-    { data: PostResumeUploadPresignBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postResumeUploadPresign>>,
-  TError,
-  { data: PostResumeUploadPresignBody },
-  TContext
-> => {
-  const mutationKey = ["postResumeUploadPresign"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postResumeUploadPresign>>,
-    { data: PostResumeUploadPresignBody }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return postResumeUploadPresign(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostResumeUploadPresignMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postResumeUploadPresign>>
->;
-export type PostResumeUploadPresignMutationBody = PostResumeUploadPresignBody;
-export type PostResumeUploadPresignMutationError =
-  | PostResumeUploadPresign400
-  | Error;
-
-/**
- * @summary Generate a presigned upload URL
- */
-export const usePostResumeUploadPresign = <
-  TError = PostResumeUploadPresign400 | Error,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postResumeUploadPresign>>,
-      TError,
-      { data: PostResumeUploadPresignBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postResumeUploadPresign>>,
-  TError,
-  { data: PostResumeUploadPresignBody },
-  TContext
-> => {
-  const mutationOptions = getPostResumeUploadPresignMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
 /**
  * Records a completed resume upload in the database after file has been uploaded to storage
  * @summary Complete resume upload
@@ -219,6 +141,272 @@ export const usePostResumeUploadComplete = <
   return useMutation(mutationOptions, queryClient);
 };
 /**
+ * Deletes a resume file from storage and removes the database record
+ * @summary Delete resume
+ */
+export const deleteResumeDeleteResumeId = (
+  resumeId: string,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  return customInstance<DeleteResumeDeleteResumeId200>(
+    { url: `/resume/delete/${resumeId}`, method: "DELETE" },
+    options,
+  );
+};
+
+export const getDeleteResumeDeleteResumeIdMutationOptions = <
+  TError =
+    | Error
+    | DeleteResumeDeleteResumeId403
+    | DeleteResumeDeleteResumeId404
+    | DeleteResumeDeleteResumeId500,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteResumeDeleteResumeId>>,
+    TError,
+    { resumeId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteResumeDeleteResumeId>>,
+  TError,
+  { resumeId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteResumeDeleteResumeId"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteResumeDeleteResumeId>>,
+    { resumeId: string }
+  > = (props) => {
+    const { resumeId } = props ?? {};
+
+    return deleteResumeDeleteResumeId(resumeId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteResumeDeleteResumeIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteResumeDeleteResumeId>>
+>;
+
+export type DeleteResumeDeleteResumeIdMutationError =
+  | Error
+  | DeleteResumeDeleteResumeId403
+  | DeleteResumeDeleteResumeId404
+  | DeleteResumeDeleteResumeId500;
+
+/**
+ * @summary Delete resume
+ */
+export const useDeleteResumeDeleteResumeId = <
+  TError =
+    | Error
+    | DeleteResumeDeleteResumeId403
+    | DeleteResumeDeleteResumeId404
+    | DeleteResumeDeleteResumeId500,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteResumeDeleteResumeId>>,
+      TError,
+      { resumeId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteResumeDeleteResumeId>>,
+  TError,
+  { resumeId: string },
+  TContext
+> => {
+  const mutationOptions = getDeleteResumeDeleteResumeIdMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * Retrieves all non-deleted resumes for the authenticated user
+ * @summary Get user's resumes
+ */
+export const getResumeListGetResume = (
+  params?: GetResumeListGetResumeParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<GetResumeListGetResume200>(
+    { url: `/resume/list/getResume`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetResumeListGetResumeQueryKey = (
+  params?: GetResumeListGetResumeParams,
+) => {
+  return [`/resume/list/getResume`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetResumeListGetResumeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getResumeListGetResume>>,
+  TError = GetResumeListGetResume400 | Error | GetResumeListGetResume500,
+>(
+  params?: GetResumeListGetResumeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getResumeListGetResume>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetResumeListGetResumeQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getResumeListGetResume>>
+  > = ({ signal }) => getResumeListGetResume(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getResumeListGetResume>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetResumeListGetResumeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getResumeListGetResume>>
+>;
+export type GetResumeListGetResumeQueryError =
+  | GetResumeListGetResume400
+  | Error
+  | GetResumeListGetResume500;
+
+export function useGetResumeListGetResume<
+  TData = Awaited<ReturnType<typeof getResumeListGetResume>>,
+  TError = GetResumeListGetResume400 | Error | GetResumeListGetResume500,
+>(
+  params: undefined | GetResumeListGetResumeParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getResumeListGetResume>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getResumeListGetResume>>,
+          TError,
+          Awaited<ReturnType<typeof getResumeListGetResume>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetResumeListGetResume<
+  TData = Awaited<ReturnType<typeof getResumeListGetResume>>,
+  TError = GetResumeListGetResume400 | Error | GetResumeListGetResume500,
+>(
+  params?: GetResumeListGetResumeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getResumeListGetResume>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getResumeListGetResume>>,
+          TError,
+          Awaited<ReturnType<typeof getResumeListGetResume>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetResumeListGetResume<
+  TData = Awaited<ReturnType<typeof getResumeListGetResume>>,
+  TError = GetResumeListGetResume400 | Error | GetResumeListGetResume500,
+>(
+  params?: GetResumeListGetResumeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getResumeListGetResume>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get user's resumes
+ */
+
+export function useGetResumeListGetResume<
+  TData = Awaited<ReturnType<typeof getResumeListGetResume>>,
+  TError = GetResumeListGetResume400 | Error | GetResumeListGetResume500,
+>(
+  params?: GetResumeListGetResumeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getResumeListGetResume>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetResumeListGetResumeQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * Creates database record after file has been successfully uploaded to storage
  * @summary Finalize resume upload
  */
@@ -309,6 +497,100 @@ export const usePostResumeUploadFinalize = <
   TContext
 > => {
   const mutationOptions = getPostResumeUploadFinalizeMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * Creates a presigned URL for uploading a resume file to Supabase storage
+ * @summary Generate a presigned upload URL
+ */
+export const postResumeUploadPresign = (
+  postResumeUploadPresignBody: PostResumeUploadPresignBody,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<PostResumeUploadPresign200>(
+    {
+      url: `/resume/upload/presign`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: postResumeUploadPresignBody,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostResumeUploadPresignMutationOptions = <
+  TError = PostResumeUploadPresign400 | Error,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postResumeUploadPresign>>,
+    TError,
+    { data: PostResumeUploadPresignBody },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postResumeUploadPresign>>,
+  TError,
+  { data: PostResumeUploadPresignBody },
+  TContext
+> => {
+  const mutationKey = ["postResumeUploadPresign"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postResumeUploadPresign>>,
+    { data: PostResumeUploadPresignBody }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postResumeUploadPresign(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostResumeUploadPresignMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postResumeUploadPresign>>
+>;
+export type PostResumeUploadPresignMutationBody = PostResumeUploadPresignBody;
+export type PostResumeUploadPresignMutationError =
+  | PostResumeUploadPresign400
+  | Error;
+
+/**
+ * @summary Generate a presigned upload URL
+ */
+export const usePostResumeUploadPresign = <
+  TError = PostResumeUploadPresign400 | Error,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postResumeUploadPresign>>,
+      TError,
+      { data: PostResumeUploadPresignBody },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postResumeUploadPresign>>,
+  TError,
+  { data: PostResumeUploadPresignBody },
+  TContext
+> => {
+  const mutationOptions = getPostResumeUploadPresignMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

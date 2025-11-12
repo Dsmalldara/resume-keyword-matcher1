@@ -1,116 +1,133 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { FileText, Mail, Building } from "lucide-react";
-import { mockAnalyses, mockResumes } from "./mocks";
+import { Resume } from "@/api/models/resume";
+import { useFetchResumes } from "../../Home/queries/resumeQuery";
+import SelectResume from "@/components/SelectResume";
+import SelectAnalysis from "@/components/SelectAnalysis"
+import { useGetAllAnalysisQuery } from "../../analysis/Queries/getAllAnalysisQuery";
+import { Controller, useForm } from "react-hook-form";
+import { createLetterValidation, CreateLetterValidationType } from "../validations/createLetterValidation";
+import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
+import { useCreateCoverLetterMutation } from "../mutations/createCoverLetterMutation";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/utils";
+import CoverLetterCreateButton from "./CoverLetterCreateButton";
 
-const CoverLetterForm = ({
-  isOpen,
-  onOpenChange,
-}: {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}) => {
-  const [selectedResume, setSelectedResume] = useState("");
-  const [selectedAnalysis, setSelectedAnalysis] = useState("");
-  const [customNotes, setCustomNotes] = useState("");
 
-  const handleSubmit = () => {
-    // Placeholder for form submission
-    console.log({ selectedResume, selectedAnalysis, customNotes });
-    onOpenChange(false);
-    // Reset form
-    setSelectedResume("");
-    setSelectedAnalysis("");
-    setCustomNotes("");
-  };
+
+const CoverLetterForm = ({ isOpen,onOpenChange,}: { isOpen: boolean; onOpenChange: (open: boolean) => void;}) => {
+    const {data, isLoading } = useFetchResumes();
+   const {
+  register,
+  handleSubmit,
+  watch,
+  control,
+  formState: { errors }
+} = useForm<CreateLetterValidationType>({ 
+  resolver: zodResolver(createLetterValidation),
+  defaultValues: {
+    resumeId: "",
+    analysisId: "",
+    customNotes: ""
+  },
+  mode: "onChange" 
+});
+      
+     const { data: analysisInfo, isLoading: isLoadingAnalysis,  } = useGetAllAnalysisQuery();
+     const {mutate:createCoverLetter, isPending:isCreating, } = useCreateCoverLetterMutation()
+     const analysis = analysisInfo?.data;
+    const resumes: Resume[] = data?.resumes || []; 
+ 
+
+
+
+ const onSubmit = (formData: CreateLetterValidationType)=>{
+    createCoverLetter(
+         {
+      data: {
+        resumeId: formData.resumeId,       
+        analysisId: formData.analysisId,    
+        customNotes: formData.customNotes,  
+      },
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          toast.success("Cover letter generated successfully!");
+        },
+        onError: (error) => {
+          toast.error(getErrorMessage(error));
+          onOpenChange(false);
+        }
+      }
+   
+    )
+ }
+
+  const selectedResumeId = watch("resumeId");
+  const selectedAnalysisId = watch("analysisId");
+
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen}
+      onOpenChange={(open) => {
+        if (isCreating) return; 
+        onOpenChange(open); }}>
+    
       <DialogContent className="sm:max-w-[600px]">
+       
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5 text-primary" />
             Generate Cover Letter
           </DialogTitle>
         </DialogHeader>
-
+           <form onSubmit={(e) => {
+      handleSubmit(onSubmit)(e);
+    }}>
         <div className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="resume-select" className="text-sm font-medium">
-              Choose Resume *
-            </Label>
-            <Select
-              value={selectedResume}
-              onValueChange={setSelectedResume}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a resume" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockResumes.map((resume) => (
-                  <SelectItem key={resume.id} value={resume.name}>
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      {resume.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                  <Controller
+              name="resumeId"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <SelectResume
+                    resumes={resumes}
+                    isLoading={isLoading}
+                    isError={false}
+                    selectedResume={field.value}
+                    setSelectedResume={field.onChange}
+                  />
+                  {errors.resumeId && (
+                    <p className="text-red-500 text-sm">{errors.resumeId.message}</p>
+                  )}
+                </>
+              )}
+            />
 
-          <div className="space-y-2">
-            <Label htmlFor="analysis-select" className="text-sm font-medium">
-              Choose Job Analysis *
-            </Label>
-            <Select
-              value={selectedAnalysis}
-              onValueChange={setSelectedAnalysis}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a job analysis" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockAnalyses.map((analysis) => (
-                  <SelectItem
-                    key={analysis.id}
-                    value={`${analysis.jobTitle}-${analysis.company}`}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2">
-                        <Building className="w-4 h-4" />
-                        <span>
-                          {analysis.jobTitle} at {analysis.company}
-                        </span>
-                      </div>
-                      <Badge variant="outline" className="ml-2 text-xs">
-                        {analysis.matchScore}% match
-                      </Badge>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <Controller
+              name="analysisId"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <SelectAnalysis
+                    analysis={analysis || []}
+                    isLoading={isLoadingAnalysis}
+                    isError={false}
+                    selectedAnalysis={field.value}
+                    setSelectedAnalysis={field.onChange}
+                  />
+                  {errors.analysisId && (
+                    <p className="text-red-500 text-sm">{errors.analysisId.message}</p>
+                  )}
+                </>
+              )}
+            />
 
           <div className="space-y-2">
             <Label htmlFor="custom-notes" className="text-sm font-medium">
@@ -119,34 +136,37 @@ const CoverLetterForm = ({
             <Textarea
               id="custom-notes"
               placeholder="e.g., emphasize leadership skills, mention specific project experience, highlight remote work capabilities..."
-              value={customNotes}
-              onChange={(e) => setCustomNotes(e.target.value)}
+             {...register("customNotes")}
               className="min-h-[80px] resize-none"
             />
             <p className="text-xs text-muted-foreground">
               Add specific points you'd like to emphasize in your cover letter
             </p>
+            <p className="text-red-500">{errors.customNotes?.message}</p>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button
+                        <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-            >
-              Cancel
+              disabled={isCreating}  > Cancel
             </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={!selectedResume || !selectedAnalysis}
+
+
+            <CoverLetterCreateButton 
+              type="submit"
+              isCreating={isCreating}
+              selectedResumeId={selectedResumeId}
+              selectedAnalysisId={selectedAnalysisId}
               className="min-w-[140px]"
-            >
-              <Mail className="w-4 h-4 mr-2" />
-              Generate Letter
-            </Button>
+            />
+          
           </div>
         </div>
+        </form>
       </DialogContent>
+     
     </Dialog>
   );
 };

@@ -11,24 +11,12 @@ import { HttpResponse, delay, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
 import type {
+  DeleteResumeDeleteResumeId200,
+  GetResumeListGetResume200,
   PostResumeUploadComplete201,
   PostResumeUploadFinalize201,
   PostResumeUploadPresign200,
 } from "../../models";
-
-export const getPostResumeUploadPresignResponseMock = (
-  overrideResponse: Partial<PostResumeUploadPresign200> = {},
-): PostResumeUploadPresign200 => ({
-  uploadUrl: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  filepath: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
 
 export const getPostResumeUploadCompleteResponseMock = (
   overrideResponse: Partial<PostResumeUploadComplete201> = {},
@@ -37,8 +25,27 @@ export const getPostResumeUploadCompleteResponseMock = (
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
-  resume: faker.helpers.arrayElement([
-    {
+  ...overrideResponse,
+});
+
+export const getDeleteResumeDeleteResumeIdResponseMock = (
+  overrideResponse: Partial<DeleteResumeDeleteResumeId200> = {},
+): DeleteResumeDeleteResumeId200 => ({
+  message: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getGetResumeListGetResumeResponseMock = (
+  overrideResponse: Partial<GetResumeListGetResume200> = {},
+): GetResumeListGetResume200 => ({
+  resumes: faker.helpers.arrayElement([
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
       id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
       storageKey: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -67,6 +74,27 @@ export const getPostResumeUploadCompleteResponseMock = (
       ]),
       createdAt: faker.helpers.arrayElement([
         `${faker.date.past().toISOString().split(".")[0]}Z`,
+        undefined,
+      ]),
+    })),
+    undefined,
+  ]),
+  pagination: faker.helpers.arrayElement([
+    {
+      page: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      perPage: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      totalItems: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+      totalPages: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
         undefined,
       ]),
     },
@@ -82,71 +110,22 @@ export const getPostResumeUploadFinalizeResponseMock = (
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
-  resume: faker.helpers.arrayElement([
-    {
-      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-      storageKey: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      profileId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-      name: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      fileUrl: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      fileSize: faker.helpers.arrayElement([
-        faker.number.int({ min: undefined, max: undefined }),
-        undefined,
-      ]),
-      version: faker.helpers.arrayElement([
-        faker.number.int({ min: undefined, max: undefined }),
-        undefined,
-      ]),
-      isActive: faker.helpers.arrayElement([
-        faker.datatype.boolean(),
-        undefined,
-      ]),
-      createdAt: faker.helpers.arrayElement([
-        `${faker.date.past().toISOString().split(".")[0]}Z`,
-        undefined,
-      ]),
-    },
+  ...overrideResponse,
+});
+
+export const getPostResumeUploadPresignResponseMock = (
+  overrideResponse: Partial<PostResumeUploadPresign200> = {},
+): PostResumeUploadPresign200 => ({
+  uploadUrl: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  filepath: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
   ...overrideResponse,
 });
-
-export const getPostResumeUploadPresignMockHandler = (
-  overrideResponse?:
-    | PostResumeUploadPresign200
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<PostResumeUploadPresign200> | PostResumeUploadPresign200),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    "*/resume/upload/presign",
-    async (info) => {
-      await delay(1000);
-
-      return new HttpResponse(
-        JSON.stringify(
-          overrideResponse !== undefined
-            ? typeof overrideResponse === "function"
-              ? await overrideResponse(info)
-              : overrideResponse
-            : getPostResumeUploadPresignResponseMock(),
-        ),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      );
-    },
-    options,
-  );
-};
 
 export const getPostResumeUploadCompleteMockHandler = (
   overrideResponse?:
@@ -170,6 +149,64 @@ export const getPostResumeUploadCompleteMockHandler = (
             : getPostResumeUploadCompleteResponseMock(),
         ),
         { status: 201, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getDeleteResumeDeleteResumeIdMockHandler = (
+  overrideResponse?:
+    | DeleteResumeDeleteResumeId200
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) =>
+        | Promise<DeleteResumeDeleteResumeId200>
+        | DeleteResumeDeleteResumeId200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    "*/resume/delete/:resumeId",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getDeleteResumeDeleteResumeIdResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getGetResumeListGetResumeMockHandler = (
+  overrideResponse?:
+    | GetResumeListGetResume200
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<GetResumeListGetResume200> | GetResumeListGetResume200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/resume/list/getResume",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getGetResumeListGetResumeResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
       );
     },
     options,
@@ -203,8 +240,38 @@ export const getPostResumeUploadFinalizeMockHandler = (
     options,
   );
 };
+
+export const getPostResumeUploadPresignMockHandler = (
+  overrideResponse?:
+    | PostResumeUploadPresign200
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<PostResumeUploadPresign200> | PostResumeUploadPresign200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/resume/upload/presign",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostResumeUploadPresignResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
 export const getResumeMock = () => [
-  getPostResumeUploadPresignMockHandler(),
   getPostResumeUploadCompleteMockHandler(),
+  getDeleteResumeDeleteResumeIdMockHandler(),
+  getGetResumeListGetResumeMockHandler(),
   getPostResumeUploadFinalizeMockHandler(),
+  getPostResumeUploadPresignMockHandler(),
 ];

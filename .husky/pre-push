@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run backend pre-push checks (generate artifacts, ensure no diffs)
+pnpm --filter backend run prepush:check

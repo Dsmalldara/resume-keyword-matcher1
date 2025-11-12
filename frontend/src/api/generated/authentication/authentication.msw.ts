@@ -15,11 +15,142 @@ import type {
   PostAuthLogin200,
   PostAuthLogout200,
   PostAuthRefresh200,
-  PostAuthResetPassword200,
   PostAuthSignup200,
   PostAuthSignup201,
+  PostAuthSync200,
   PostAuthVerifyResetToken200,
 } from "../../models";
+
+export const getPostAuthForgotPasswordResponseMock = (
+  overrideResponse: Partial<PostAuthForgotPassword200> = {},
+): PostAuthForgotPassword200 => ({
+  message: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPostAuthLoginResponseMock = (
+  overrideResponse: Partial<PostAuthLogin200> = {},
+): PostAuthLogin200 => ({
+  message: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  user: faker.helpers.arrayElement([
+    {
+      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      email: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    },
+    undefined,
+  ]),
+  access_token: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPostAuthLogoutResponseMock = (
+  overrideResponse: Partial<PostAuthLogout200> = {},
+): PostAuthLogout200 => ({
+  message: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPostAuthSyncResponseMock = (
+  overrideResponse: Partial<PostAuthSync200> = {},
+): PostAuthSync200 => ({
+  message: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  userId: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPostAuthRefreshResponseMock = (
+  overrideResponse: Partial<PostAuthRefresh200> = {},
+): PostAuthRefresh200 => ({
+  message: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  user: faker.helpers.arrayElement([
+    {
+      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
+      email: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      name: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      bio: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      avatarUrl: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+      username: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+          faker.string.alpha({ length: { min: 10, max: 20 } }),
+          null,
+        ]),
+        undefined,
+      ]),
+    },
+    undefined,
+  ]),
+  access_token: faker.helpers.arrayElement([
+    faker.string.alpha({ length: { min: 10, max: 20 } }),
+    undefined,
+  ]),
+  ...overrideResponse,
+});
+
+export const getPostAuthVerifyResetTokenResponseMock = (
+  overrideResponse: Partial<PostAuthVerifyResetToken200> = {},
+): PostAuthVerifyResetToken200 => ({
+  valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+  user: faker.helpers.arrayElement([
+    {
+      id: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+      email: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+      ]),
+    },
+    undefined,
+  ]),
+  ...overrideResponse,
+});
 
 export const getPostAuthSignupResponseMock = (
   overrideResponse: Partial<PostAuthSignup200 | PostAuthSignup201> = {},
@@ -78,147 +209,16 @@ export const getPostAuthSignupResponseMock = (
     },
   ]);
 
-export const getPostAuthLoginResponseMock = (
-  overrideResponse: Partial<PostAuthLogin200> = {},
-): PostAuthLogin200 => ({
-  message: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  user: faker.helpers.arrayElement([
-    {
-      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-      email: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      name: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  access_token: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getPostAuthRefreshResponseMock = (
-  overrideResponse: Partial<PostAuthRefresh200> = {},
-): PostAuthRefresh200 => ({
-  message: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  user: faker.helpers.arrayElement([
-    {
-      id: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-      email: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      name: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      bio: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          null,
-        ]),
-        undefined,
-      ]),
-      avatarUrl: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          null,
-        ]),
-        undefined,
-      ]),
-      username: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-          faker.string.alpha({ length: { min: 10, max: 20 } }),
-          null,
-        ]),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  access_token: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getPostAuthForgotPasswordResponseMock = (
-  overrideResponse: Partial<PostAuthForgotPassword200> = {},
-): PostAuthForgotPassword200 => ({
-  message: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getPostAuthVerifyResetTokenResponseMock = (
-  overrideResponse: Partial<PostAuthVerifyResetToken200> = {},
-): PostAuthVerifyResetToken200 => ({
-  valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  user: faker.helpers.arrayElement([
-    {
-      id: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-      email: faker.helpers.arrayElement([
-        faker.string.alpha({ length: { min: 10, max: 20 } }),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getPostAuthResetPasswordResponseMock = (
-  overrideResponse: Partial<PostAuthResetPassword200> = {},
-): PostAuthResetPassword200 => ({
-  message: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getPostAuthLogoutResponseMock = (
-  overrideResponse: Partial<PostAuthLogout200> = {},
-): PostAuthLogout200 => ({
-  message: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getPostAuthSignupMockHandler = (
+export const getPostAuthForgotPasswordMockHandler = (
   overrideResponse?:
-    | PostAuthSignup200
-    | PostAuthSignup201
+    | PostAuthForgotPassword200
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) =>
-        | Promise<PostAuthSignup200 | PostAuthSignup201>
-        | PostAuthSignup200
-        | PostAuthSignup201),
+      ) => Promise<PostAuthForgotPassword200> | PostAuthForgotPassword200),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
-    "*/auth/signup",
+    "*/auth/forgot-password",
     async (info) => {
       await delay(1000);
 
@@ -228,7 +228,7 @@ export const getPostAuthSignupMockHandler = (
             ? typeof overrideResponse === "function"
               ? await overrideResponse(info)
               : overrideResponse
-            : getPostAuthSignupResponseMock(),
+            : getPostAuthForgotPasswordResponseMock(),
         ),
         { status: 200, headers: { "Content-Type": "application/json" } },
       );
@@ -265,6 +265,62 @@ export const getPostAuthLoginMockHandler = (
   );
 };
 
+export const getPostAuthLogoutMockHandler = (
+  overrideResponse?:
+    | PostAuthLogout200
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<PostAuthLogout200> | PostAuthLogout200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/auth/logout",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostAuthLogoutResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
+export const getPostAuthSyncMockHandler = (
+  overrideResponse?:
+    | PostAuthSync200
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<PostAuthSync200> | PostAuthSync200),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/auth/sync",
+    async (info) => {
+      await delay(1000);
+
+      return new HttpResponse(
+        JSON.stringify(
+          overrideResponse !== undefined
+            ? typeof overrideResponse === "function"
+              ? await overrideResponse(info)
+              : overrideResponse
+            : getPostAuthSyncResponseMock(),
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    },
+    options,
+  );
+};
+
 export const getPostAuthRefreshMockHandler = (
   overrideResponse?:
     | PostAuthRefresh200
@@ -285,76 +341,6 @@ export const getPostAuthRefreshMockHandler = (
               ? await overrideResponse(info)
               : overrideResponse
             : getPostAuthRefreshResponseMock(),
-        ),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      );
-    },
-    options,
-  );
-};
-
-export const getGetAuthGoogleMockHandler = (
-  overrideResponse?:
-    | unknown
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<unknown> | unknown),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/auth/google",
-    async (info) => {
-      await delay(1000);
-      if (typeof overrideResponse === "function") {
-        await overrideResponse(info);
-      }
-      return new HttpResponse(null, { status: 200 });
-    },
-    options,
-  );
-};
-
-export const getGetAuthCallbackMockHandler = (
-  overrideResponse?:
-    | unknown
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<unknown> | unknown),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/auth/callback",
-    async (info) => {
-      await delay(1000);
-      if (typeof overrideResponse === "function") {
-        await overrideResponse(info);
-      }
-      return new HttpResponse(null, { status: 200 });
-    },
-    options,
-  );
-};
-
-export const getPostAuthForgotPasswordMockHandler = (
-  overrideResponse?:
-    | PostAuthForgotPassword200
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<PostAuthForgotPassword200> | PostAuthForgotPassword200),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    "*/auth/forgot-password",
-    async (info) => {
-      await delay(1000);
-
-      return new HttpResponse(
-        JSON.stringify(
-          overrideResponse !== undefined
-            ? typeof overrideResponse === "function"
-              ? await overrideResponse(info)
-              : overrideResponse
-            : getPostAuthForgotPasswordResponseMock(),
         ),
         { status: 200, headers: { "Content-Type": "application/json" } },
       );
@@ -391,16 +377,20 @@ export const getPostAuthVerifyResetTokenMockHandler = (
   );
 };
 
-export const getPostAuthResetPasswordMockHandler = (
+export const getPostAuthSignupMockHandler = (
   overrideResponse?:
-    | PostAuthResetPassword200
+    | PostAuthSignup200
+    | PostAuthSignup201
     | ((
         info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<PostAuthResetPassword200> | PostAuthResetPassword200),
+      ) =>
+        | Promise<PostAuthSignup200 | PostAuthSignup201>
+        | PostAuthSignup200
+        | PostAuthSignup201),
   options?: RequestHandlerOptions,
 ) => {
   return http.post(
-    "*/auth/reset-password",
+    "*/auth/signup",
     async (info) => {
       await delay(1000);
 
@@ -410,35 +400,7 @@ export const getPostAuthResetPasswordMockHandler = (
             ? typeof overrideResponse === "function"
               ? await overrideResponse(info)
               : overrideResponse
-            : getPostAuthResetPasswordResponseMock(),
-        ),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      );
-    },
-    options,
-  );
-};
-
-export const getPostAuthLogoutMockHandler = (
-  overrideResponse?:
-    | PostAuthLogout200
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<PostAuthLogout200> | PostAuthLogout200),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    "*/auth/logout",
-    async (info) => {
-      await delay(1000);
-
-      return new HttpResponse(
-        JSON.stringify(
-          overrideResponse !== undefined
-            ? typeof overrideResponse === "function"
-              ? await overrideResponse(info)
-              : overrideResponse
-            : getPostAuthLogoutResponseMock(),
+            : getPostAuthSignupResponseMock(),
         ),
         { status: 200, headers: { "Content-Type": "application/json" } },
       );
@@ -447,13 +409,11 @@ export const getPostAuthLogoutMockHandler = (
   );
 };
 export const getAuthenticationMock = () => [
-  getPostAuthSignupMockHandler(),
-  getPostAuthLoginMockHandler(),
-  getPostAuthRefreshMockHandler(),
-  getGetAuthGoogleMockHandler(),
-  getGetAuthCallbackMockHandler(),
   getPostAuthForgotPasswordMockHandler(),
-  getPostAuthVerifyResetTokenMockHandler(),
-  getPostAuthResetPasswordMockHandler(),
+  getPostAuthLoginMockHandler(),
   getPostAuthLogoutMockHandler(),
+  getPostAuthSyncMockHandler(),
+  getPostAuthRefreshMockHandler(),
+  getPostAuthVerifyResetTokenMockHandler(),
+  getPostAuthSignupMockHandler(),
 ];

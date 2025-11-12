@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
+import { redirect } from "next/navigation";
 
 const AXIOS_INSTANCE = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -50,6 +51,7 @@ AXIOS_INSTANCE.interceptors.response.use(
           `Bearer ${data.access_token}`;
         return AXIOS_INSTANCE(originalRequest);
       } catch (refreshError) {
+        redirect('/auth/login');
         return Promise.reject(refreshError);
       }
     }

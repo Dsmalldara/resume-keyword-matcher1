@@ -1,9 +1,9 @@
+import * as dotenv from "dotenv";
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import dotenv from "dotenv";
-import authRoutes from './routes/auth.routes';
-import resumeRoutes from './routes/resume.routes';
+
+
 import { requestIdMiddleware } from './middleware/requestId';
 import { Request, Response, NextFunction } from "express";
 import logger from '../utils/logger';
@@ -12,7 +12,12 @@ import debugRoutes from './routes/debug.routes';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from '../swagger.config';
 import cookieParser from 'cookie-parser';
-
+import activityRoutes from './routes/activity/activity.routes';
+import resumeRoutes from "./routes/resumes/index"
+import analysisRoutes from "./routes/analysis/index"
+import InsightsRoutes from "./routes/insights/index"
+import authRoutes from "./routes/auth/index"
+import CoverLetterRoutes from "./routes/coverletters/index"
 
 dotenv.config();
 
@@ -81,7 +86,11 @@ app.get('/api-docs.json', (req, res) => {
 // Routes
 app.use('/auth', authRoutes);
 app.use('/resume', resumeRoutes);
+app.use('/activity', activityRoutes)
 app.use("/debug", debugRoutes);
+app.use("/analysis", analysisRoutes);
+app.use("/insights", InsightsRoutes);
+app.use("/coverletters", CoverLetterRoutes);
 
 
 

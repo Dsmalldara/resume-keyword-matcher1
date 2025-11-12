@@ -5,17 +5,26 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import CoverLetterCard from "./CoverLetterCard";
 import CoverLetterModal from "./CoverLetterModal";
-import { mockCoverLetters } from "./mocks";
 import CoverLetterEmptyState from "./CoverLetterEmpty";
 import { coverLetterType } from "./types";
+import { useGetCoverLetters } from "../queries/useGetCoverLetter";
+import CoverLetterLoadingState from "./CoverLetterLoadingState";
+import { GetCoverlettersLettersParams } from "@/api/models";
+import Pagination from "@/components/ui/pagination";
 
-// Main Cover Letters Page Component
+
 export default function CoverLettersPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedCoverLetter, setSelectedCoverLetter] =
-    useState<coverLetterType | null>(null);
+  const [selectedCoverLetter, setSelectedCoverLetter] = useState<coverLetterType | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
+  const [paginationState, setPaginationState] = useState({
+    page: 1,
+    perPage: 10,
+  });
 
+     const {data:coverLetterData, isLoading:isCoverLetterLoading, } = useGetCoverLetters()
+      const coverLetters = coverLetterData?.coverLetters ?? []
+      const totalPages = Math.ceil((coverLetterData?.pagination?.totalPages ?? 0) / paginationState.perPage)
   const handleView = (coverLetter: coverLetterType) => {
     setSelectedCoverLetter(coverLetter);
     setIsViewOpen(true);
@@ -51,23 +60,34 @@ export default function CoverLettersPage() {
             Generate Cover Letter
           </Button>
         </div>
-
-        {/* Main Content */}
-        {mockCoverLetters.length === 0 ? (
-          <CoverLetterEmptyState onGenerate={handleGenerate} />
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {mockCoverLetters.map((coverLetter) => (
+          {/* Main Content */}
+        {
+          isCoverLetterLoading && (
+              <CoverLetterLoadingState/>
+          )
+        }
+        {
+          coverLetters.length === 0 && !isCoverLetterLoading ? (
+            <CoverLetterEmptyState onGenerate={handleGenerate} />
+          ) :
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {coverLetters.map((coverLetter) => (
               <CoverLetterCard
                 key={coverLetter.id}
                 coverLetter={coverLetter}
                 onView={handleView}
                 onDelete={handleDelete}
               />
-            ))}
+            ))  }
           </div>
-        )}
-
+}
+          <div>
+             <Pagination
+                currentPage={paginationState.page ?? 1}
+                totalPages={totalPages}
+                onPageChange={(page) => setPaginationState((s) => ({ ...(s || {}), page }))}
+              />
+          </div>
         {/* Modals */}
         <CoverLetterForm isOpen={isFormOpen} onOpenChange={setIsFormOpen} />
         {selectedCoverLetter && (

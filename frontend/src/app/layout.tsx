@@ -4,6 +4,7 @@ import "./globals.css";
 import { generateMetadata } from "@/lib/generate-metadata";
 import Providers from "./providers";
 import { Toaster } from "sonner";
+import { JobProvider } from "./jobProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,8 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
+        <JobProvider>
           {children}
           <Toaster />
+        </JobProvider>
         </Providers>
       </body>
     </html>

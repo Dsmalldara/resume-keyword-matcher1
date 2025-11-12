@@ -11,6 +11,7 @@ export interface Resume {
   storageKey?: string;
   profileId?: string;
   name?: string;
+  status?: 'pending' | 'processing' | 'processed' | 'failed';
   fileUrl?: string;
   fileSize?: number;
   version?: number;

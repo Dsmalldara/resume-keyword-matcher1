@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "ai": "npm:ai@^3.0.0",
+    "@ai-sdk/google": "npm:@ai-sdk/google@^0.0.0"
+  }
+}

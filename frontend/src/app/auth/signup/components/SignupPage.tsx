@@ -11,6 +11,7 @@ import {
   AuthRevertButton,
 } from "../../template/auth-template";
 import { useSignUpMutation } from "../mutations/signupMutation";
+import { useLoginWithGoogle } from "../../login/queries/useLoginWithGoogle";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { SignupValidation, SignupValidationType } from "./signup-validation";
@@ -46,10 +47,8 @@ export default function BrutalSignup() {
     );
   };
 
-  const handleGoogleLogin = () => {
-    // Handle Google OAuth logic here
-    console.log("Login with Google");
-  };
+    const { start } = useLoginWithGoogle();
+ 
 
   if (isSubmitted) {
     return (
@@ -135,7 +134,7 @@ export default function BrutalSignup() {
         </form>
         <AuthDividerLine />
 
-        <AuthContinueWithGoogle onClick={handleGoogleLogin} />
+        <AuthContinueWithGoogle onClick={start} />
       </div>
 
       <AuthRevertButton>

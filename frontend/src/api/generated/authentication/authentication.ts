@@ -5,25 +5,16 @@
  * Backend API for AI-powered resume analysis. Matches CVs against job descriptions, identifies missing keywords, calculates compatibility scores, and generates personalized cover letter suggestions. Built with Node.js/Express.
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
 } from "@tanstack/react-query";
 
 import type {
   Error,
-  GetAuthCallbackParams,
   PostAuthForgotPassword200,
   PostAuthForgotPassword400,
   PostAuthForgotPasswordBody,
@@ -32,13 +23,12 @@ import type {
   PostAuthLoginBody,
   PostAuthLogout200,
   PostAuthRefresh200,
-  PostAuthResetPassword200,
-  PostAuthResetPassword400,
-  PostAuthResetPasswordBody,
   PostAuthSignup200,
   PostAuthSignup201,
   PostAuthSignup400,
   PostAuthSignupBody,
+  PostAuthSync200,
+  PostAuthSync400,
   PostAuthVerifyResetToken200,
   PostAuthVerifyResetTokenBody,
   ValidationError,
@@ -49,44 +39,44 @@ import { customInstance } from "../../client";
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * Creates a new user account with email and password
- * @summary Register a new user
+ * Sends a password reset email to the user
+ * @summary Request password reset
  */
-export const postAuthSignup = (
-  postAuthSignupBody: PostAuthSignupBody,
+export const postAuthForgotPassword = (
+  postAuthForgotPasswordBody: PostAuthForgotPasswordBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<PostAuthSignup200 | PostAuthSignup201>(
+  return customInstance<PostAuthForgotPassword200>(
     {
-      url: `/auth/signup`,
+      url: `/auth/forgot-password`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: postAuthSignupBody,
+      data: postAuthForgotPasswordBody,
       signal,
     },
     options,
   );
 };
 
-export const getPostAuthSignupMutationOptions = <
-  TError = PostAuthSignup400 | Error,
+export const getPostAuthForgotPasswordMutationOptions = <
+  TError = PostAuthForgotPassword400,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postAuthSignup>>,
+    Awaited<ReturnType<typeof postAuthForgotPassword>>,
     TError,
-    { data: PostAuthSignupBody },
+    { data: PostAuthForgotPasswordBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postAuthSignup>>,
+  Awaited<ReturnType<typeof postAuthForgotPassword>>,
   TError,
-  { data: PostAuthSignupBody },
+  { data: PostAuthForgotPasswordBody },
   TContext
 > => {
-  const mutationKey = ["postAuthSignup"];
+  const mutationKey = ["postAuthForgotPassword"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -96,47 +86,47 @@ export const getPostAuthSignupMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postAuthSignup>>,
-    { data: PostAuthSignupBody }
+    Awaited<ReturnType<typeof postAuthForgotPassword>>,
+    { data: PostAuthForgotPasswordBody }
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAuthSignup(data, requestOptions);
+    return postAuthForgotPassword(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PostAuthSignupMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postAuthSignup>>
+export type PostAuthForgotPasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postAuthForgotPassword>>
 >;
-export type PostAuthSignupMutationBody = PostAuthSignupBody;
-export type PostAuthSignupMutationError = PostAuthSignup400 | Error;
+export type PostAuthForgotPasswordMutationBody = PostAuthForgotPasswordBody;
+export type PostAuthForgotPasswordMutationError = PostAuthForgotPassword400;
 
 /**
- * @summary Register a new user
+ * @summary Request password reset
  */
-export const usePostAuthSignup = <
-  TError = PostAuthSignup400 | Error,
+export const usePostAuthForgotPassword = <
+  TError = PostAuthForgotPassword400,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAuthSignup>>,
+      Awaited<ReturnType<typeof postAuthForgotPassword>>,
       TError,
-      { data: PostAuthSignupBody },
+      { data: PostAuthForgotPasswordBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postAuthSignup>>,
+  Awaited<ReturnType<typeof postAuthForgotPassword>>,
   TError,
-  { data: PostAuthSignupBody },
+  { data: PostAuthForgotPasswordBody },
   TContext
 > => {
-  const mutationOptions = getPostAuthSignupMutationOptions(options);
+  const mutationOptions = getPostAuthForgotPasswordMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -233,6 +223,169 @@ export const usePostAuthLogin = <
   return useMutation(mutationOptions, queryClient);
 };
 /**
+ * Signs out the user and clears refresh token cookie
+ * @summary Logout user
+ */
+export const postAuthLogout = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<PostAuthLogout200>(
+    { url: `/auth/logout`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostAuthLogoutMutationOptions = <
+  TError = Error,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postAuthLogout>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postAuthLogout>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["postAuthLogout"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postAuthLogout>>,
+    void
+  > = () => {
+    return postAuthLogout(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostAuthLogoutMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postAuthLogout>>
+>;
+
+export type PostAuthLogoutMutationError = Error;
+
+/**
+ * @summary Logout user
+ */
+export const usePostAuthLogout = <TError = Error, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postAuthLogout>>,
+      TError,
+      void,
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postAuthLogout>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationOptions = getPostAuthLogoutMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * Retrieves the user from Supabase by ID (from the access token) and creates/updates the local profile record. this is  only needed when a user uses gogole oauth to login for the first time. it is a batch fix for a small flaw in profile
+ * @summary Sync user profile from Supabase
+ */
+export const postAuthSync = (
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<PostAuthSync200>(
+    { url: `/auth/sync`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getPostAuthSyncMutationOptions = <
+  TError = PostAuthSync400 | Error,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postAuthSync>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postAuthSync>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["postAuthSync"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postAuthSync>>,
+    void
+  > = () => {
+    return postAuthSync(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostAuthSyncMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postAuthSync>>
+>;
+
+export type PostAuthSyncMutationError = PostAuthSync400 | Error;
+
+/**
+ * @summary Sync user profile from Supabase
+ */
+export const usePostAuthSync = <
+  TError = PostAuthSync400 | Error,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postAuthSync>>,
+      TError,
+      void,
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postAuthSync>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationOptions = getPostAuthSyncMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * Generates a new access token using the refresh token from cookies
  * @summary Refresh access token
  */
@@ -312,396 +465,6 @@ export const usePostAuthRefresh = <
   TContext
 > => {
   const mutationOptions = getPostAuthRefreshMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-/**
- * Redirects user to Google OAuth consent page
- * @summary Initiate Google OAuth login
- */
-export const getAuthGoogle = (
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<unknown>(
-    { url: `/auth/google`, method: "GET", signal },
-    options,
-  );
-};
-
-export const getGetAuthGoogleQueryKey = () => {
-  return [`/auth/google`] as const;
-};
-
-export const getGetAuthGoogleQueryOptions = <
-  TData = Awaited<ReturnType<typeof getAuthGoogle>>,
-  TError = void | Error,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getAuthGoogle>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetAuthGoogleQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAuthGoogle>>> = ({
-    signal,
-  }) => getAuthGoogle(requestOptions, signal);
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getAuthGoogle>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type GetAuthGoogleQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getAuthGoogle>>
->;
-export type GetAuthGoogleQueryError = void | Error;
-
-export function useGetAuthGoogle<
-  TData = Awaited<ReturnType<typeof getAuthGoogle>>,
-  TError = void | Error,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAuthGoogle>>, TError, TData>
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAuthGoogle>>,
-          TError,
-          Awaited<ReturnType<typeof getAuthGoogle>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetAuthGoogle<
-  TData = Awaited<ReturnType<typeof getAuthGoogle>>,
-  TError = void | Error,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAuthGoogle>>, TError, TData>
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAuthGoogle>>,
-          TError,
-          Awaited<ReturnType<typeof getAuthGoogle>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetAuthGoogle<
-  TData = Awaited<ReturnType<typeof getAuthGoogle>>,
-  TError = void | Error,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAuthGoogle>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-/**
- * @summary Initiate Google OAuth login
- */
-
-export function useGetAuthGoogle<
-  TData = Awaited<ReturnType<typeof getAuthGoogle>>,
-  TError = void | Error,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getAuthGoogle>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetAuthGoogleQueryOptions(options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-/**
- * Handles OAuth callback from Google and exchanges code for session
- * @summary OAuth callback handler
- */
-export const getAuthCallback = (
-  params?: GetAuthCallbackParams,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<unknown>(
-    { url: `/auth/callback`, method: "GET", params, signal },
-    options,
-  );
-};
-
-export const getGetAuthCallbackQueryKey = (params?: GetAuthCallbackParams) => {
-  return [`/auth/callback`, ...(params ? [params] : [])] as const;
-};
-
-export const getGetAuthCallbackQueryOptions = <
-  TData = Awaited<ReturnType<typeof getAuthCallback>>,
-  TError = void,
->(
-  params?: GetAuthCallbackParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getAuthCallback>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetAuthCallbackQueryKey(params);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAuthCallback>>> = ({
-    signal,
-  }) => getAuthCallback(params, requestOptions, signal);
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getAuthCallback>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type GetAuthCallbackQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getAuthCallback>>
->;
-export type GetAuthCallbackQueryError = void;
-
-export function useGetAuthCallback<
-  TData = Awaited<ReturnType<typeof getAuthCallback>>,
-  TError = void,
->(
-  params: undefined | GetAuthCallbackParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getAuthCallback>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAuthCallback>>,
-          TError,
-          Awaited<ReturnType<typeof getAuthCallback>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetAuthCallback<
-  TData = Awaited<ReturnType<typeof getAuthCallback>>,
-  TError = void,
->(
-  params?: GetAuthCallbackParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getAuthCallback>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAuthCallback>>,
-          TError,
-          Awaited<ReturnType<typeof getAuthCallback>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetAuthCallback<
-  TData = Awaited<ReturnType<typeof getAuthCallback>>,
-  TError = void,
->(
-  params?: GetAuthCallbackParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getAuthCallback>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-/**
- * @summary OAuth callback handler
- */
-
-export function useGetAuthCallback<
-  TData = Awaited<ReturnType<typeof getAuthCallback>>,
-  TError = void,
->(
-  params?: GetAuthCallbackParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof getAuthCallback>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetAuthCallbackQueryOptions(params, options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-/**
- * Sends a password reset email to the user
- * @summary Request password reset
- */
-export const postAuthForgotPassword = (
-  postAuthForgotPasswordBody: PostAuthForgotPasswordBody,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<PostAuthForgotPassword200>(
-    {
-      url: `/auth/forgot-password`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: postAuthForgotPasswordBody,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostAuthForgotPasswordMutationOptions = <
-  TError = PostAuthForgotPassword400,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postAuthForgotPassword>>,
-    TError,
-    { data: PostAuthForgotPasswordBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postAuthForgotPassword>>,
-  TError,
-  { data: PostAuthForgotPasswordBody },
-  TContext
-> => {
-  const mutationKey = ["postAuthForgotPassword"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postAuthForgotPassword>>,
-    { data: PostAuthForgotPasswordBody }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return postAuthForgotPassword(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostAuthForgotPasswordMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postAuthForgotPassword>>
->;
-export type PostAuthForgotPasswordMutationBody = PostAuthForgotPasswordBody;
-export type PostAuthForgotPasswordMutationError = PostAuthForgotPassword400;
-
-/**
- * @summary Request password reset
- */
-export const usePostAuthForgotPassword = <
-  TError = PostAuthForgotPassword400,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAuthForgotPassword>>,
-      TError,
-      { data: PostAuthForgotPasswordBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postAuthForgotPassword>>,
-  TError,
-  { data: PostAuthForgotPasswordBody },
-  TContext
-> => {
-  const mutationOptions = getPostAuthForgotPasswordMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -795,44 +558,44 @@ export const usePostAuthVerifyResetToken = <TError = Error, TContext = unknown>(
   return useMutation(mutationOptions, queryClient);
 };
 /**
- * Updates the user password using the reset token sent via email.
- * @summary Reset password with token
+ * Creates a new user account with email and password
+ * @summary Register a new user
  */
-export const postAuthResetPassword = (
-  postAuthResetPasswordBody: PostAuthResetPasswordBody,
+export const postAuthSignup = (
+  postAuthSignupBody: PostAuthSignupBody,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<PostAuthResetPassword200>(
+  return customInstance<PostAuthSignup200 | PostAuthSignup201>(
     {
-      url: `/auth/reset-password`,
+      url: `/auth/signup`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: postAuthResetPasswordBody,
+      data: postAuthSignupBody,
       signal,
     },
     options,
   );
 };
 
-export const getPostAuthResetPasswordMutationOptions = <
-  TError = PostAuthResetPassword400 | Error,
+export const getPostAuthSignupMutationOptions = <
+  TError = PostAuthSignup400 | Error,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postAuthResetPassword>>,
+    Awaited<ReturnType<typeof postAuthSignup>>,
     TError,
-    { data: PostAuthResetPasswordBody },
+    { data: PostAuthSignupBody },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postAuthResetPassword>>,
+  Awaited<ReturnType<typeof postAuthSignup>>,
   TError,
-  { data: PostAuthResetPasswordBody },
+  { data: PostAuthSignupBody },
   TContext
 > => {
-  const mutationKey = ["postAuthResetPassword"];
+  const mutationKey = ["postAuthSignup"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -842,129 +605,47 @@ export const getPostAuthResetPasswordMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postAuthResetPassword>>,
-    { data: PostAuthResetPasswordBody }
+    Awaited<ReturnType<typeof postAuthSignup>>,
+    { data: PostAuthSignupBody }
   > = (props) => {
     const { data } = props ?? {};
 
-    return postAuthResetPassword(data, requestOptions);
+    return postAuthSignup(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PostAuthResetPasswordMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postAuthResetPassword>>
+export type PostAuthSignupMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postAuthSignup>>
 >;
-export type PostAuthResetPasswordMutationBody = PostAuthResetPasswordBody;
-export type PostAuthResetPasswordMutationError =
-  | PostAuthResetPassword400
-  | Error;
+export type PostAuthSignupMutationBody = PostAuthSignupBody;
+export type PostAuthSignupMutationError = PostAuthSignup400 | Error;
 
 /**
- * @summary Reset password with token
+ * @summary Register a new user
  */
-export const usePostAuthResetPassword = <
-  TError = PostAuthResetPassword400 | Error,
+export const usePostAuthSignup = <
+  TError = PostAuthSignup400 | Error,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAuthResetPassword>>,
+      Awaited<ReturnType<typeof postAuthSignup>>,
       TError,
-      { data: PostAuthResetPasswordBody },
+      { data: PostAuthSignupBody },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postAuthResetPassword>>,
+  Awaited<ReturnType<typeof postAuthSignup>>,
   TError,
-  { data: PostAuthResetPasswordBody },
+  { data: PostAuthSignupBody },
   TContext
 > => {
-  const mutationOptions = getPostAuthResetPasswordMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-/**
- * Signs out the user and clears refresh token cookie
- * @summary Logout user
- */
-export const postAuthLogout = (
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<PostAuthLogout200>(
-    { url: `/auth/logout`, method: "POST", signal },
-    options,
-  );
-};
-
-export const getPostAuthLogoutMutationOptions = <
-  TError = Error,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postAuthLogout>>,
-    TError,
-    void,
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postAuthLogout>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationKey = ["postAuthLogout"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postAuthLogout>>,
-    void
-  > = () => {
-    return postAuthLogout(requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostAuthLogoutMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postAuthLogout>>
->;
-
-export type PostAuthLogoutMutationError = Error;
-
-/**
- * @summary Logout user
- */
-export const usePostAuthLogout = <TError = Error, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAuthLogout>>,
-      TError,
-      void,
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postAuthLogout>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationOptions = getPostAuthLogoutMutationOptions(options);
+  const mutationOptions = getPostAuthSignupMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

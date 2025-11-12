@@ -11,12 +11,15 @@ import {
 } from "../../template/auth-template";
 import Link from "next/link";
 import { useLoginMutation } from "../mutations/LoginMutation";
+import { useLoginWithGoogle } from "../queries/useLoginWithGoogle";
 import { loginValidation, LoginValidationType } from "./login-validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+
+
 export default function LoginPage() {
   const router = useRouter();
   const { mutate: LoginSubmit, isPending, isError } = useLoginMutation();
@@ -28,16 +31,16 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginValidationType>({ resolver: zodResolver(loginValidation) });
 
-  const handleGoogleLogin = () => {
-    // Handle Google OAuth logic here
-    console.log("Login with Google");
-  };
+   const { start } = useLoginWithGoogle();
+
+ 
   const onSubmit = (data: LoginValidationType) => {
     LoginSubmit(
       { data },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
           toast.success("Login successful!");
+       
           setTimeout(() => {
             router.push("/");
           }, 1000);
@@ -92,7 +95,7 @@ export default function LoginPage() {
 
           <AuthDividerLine />
         </form>
-        <AuthContinueWithGoogle onClick={handleGoogleLogin} />
+        <AuthContinueWithGoogle onClick={start} />
       </div>
 
       <div className="p-8 bg-gray-50 border-t-4 border-black">

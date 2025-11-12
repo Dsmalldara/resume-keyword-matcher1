@@ -1,130 +1,98 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Dialog,DialogContent,DialogHeader,DialogTitle,} from "@/components/ui/dialog";
 import { FileText, TrendingUp } from "lucide-react";
-import { mockResumes } from "./mocks";
+import { Resume } from "@/api/models/resume";
+import { useFetchResumes } from "../../Home/queries/resumeQuery";
+import SelectResume from "@/components/SelectResume";
+import { JobDescriptionDataType, jobDescriptionValidation } from "../validations/jobDescriptionValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useCreateAnalysisMutation } from "../mutations/createAnalysisMutation";
+import { JobDescriptionTextArea, JobInput } from "@/components/jobDescriptionUtils";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/utils";
+import IsAnalyzingButton from "./IsAnalyzingButton";
 
 // Analysis Form Component
-const AnalysisForm = ({
-  isOpen,
-  onOpenChange,
-}: {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}) => {
-  const [selectedResume, setSelectedResume] = useState("");
-  const [jobDescription, setJobDescription] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
-  const [company, setCompany] = useState("");
+const AnalysisForm = ({ isOpen, onOpenChange}: {isOpen: boolean; onOpenChange: (open: boolean) => void;}) => {
+  const [selectedResumeId, setSelectedResumeId] = useState("");
+    const {
+      register, handleSubmit,reset, formState: { errors }} = useForm<JobDescriptionDataType>({ resolver: zodResolver(jobDescriptionValidation) });
+     const {mutate:createAnalysis, isPending: isAnalyzing} = useCreateAnalysisMutation()
+      const onSubmit = (data: JobDescriptionDataType) => {
+        createAnalysis(
+          {
+            data: {
+              resumeId: selectedResumeId,
+              jobDescription: data.jobDescription,
+              jobTitle: data.jobTitle,
+              company: data.company,
+            }
+          },
+          {
+            onSuccess: (response) => {
+             toast.success("Analysis created successfully!");
+              onOpenChange(false);
+              reset(
+                {jobDescription: "", jobTitle: "", company: ""}
+              )
+            },
+            onError: (error) => {
+              toast.error(getErrorMessage(error));
+              onOpenChange(false);
+            },
+          },
+        );
+      };
 
-  interface FormData {
-    selectedResume: string;
-    jobDescription: string;
-    jobTitle: string;
-    company: string;
-  }
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    // Placeholder for form submission
-    const formData: FormData = {
-      selectedResume,
-      jobDescription,
-      jobTitle,
-      company,
-    };
-    console.log(formData);
-    onOpenChange(false);
-  };
-
+  
+  const {data, isLoading } = useFetchResumes();
+  console.log("Fetched resumes data:", data);
+  const resumes: Resume[] = data?.resumes || [];
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] md:max-h-[100vh] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-primary" />
             Run New Analysis
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <SelectResume
+            resumes={resumes}
+            setSelectedResume={setSelectedResumeId}
+            selectedResume={selectedResumeId}
+            isLoading={isLoading}
+            isError={false}
+          />
           <div className="space-y-2">
-            <Label htmlFor="resume-select" className="text-sm font-medium">
-              Choose Resume *
-            </Label>
-            <Select
-              value={selectedResume}
-              onValueChange={setSelectedResume}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a resume to analyze" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockResumes.map((resume) => (
-                  <SelectItem key={resume.id} value={resume.name}>
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      {resume.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="job-description" className="text-sm font-medium">
-              Job Description *
-            </Label>
-            <Textarea
-              id="job-description"
-              placeholder="Paste the complete job description here..."
-              value={jobDescription}
-              onChange={(e) => setJobDescription(e.target.value)}
-              className="min-h-[120px] resize-none"
-              required
+            <JobDescriptionTextArea
+              label="Job Description (optional)*"
+              {...register("jobDescription")}
+              placeholder="Enter Job Description"
             />
+            <p className="text-red-500">{errors.jobDescription?.message}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="job-title" className="text-sm font-medium">
-                Job Title
-              </Label>
-              <Input
-                id="job-title"
-                placeholder="e.g., Senior Frontend Developer"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
+              <JobInput
+                label="Job Title (optional)"
+                {...register("jobTitle")}
+                placeholder="Enter Job Title"
               />
+              <p className="text-red-500">{errors.jobTitle?.message}</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company" className="text-sm font-medium">
-                Company
-              </Label>
-              <Input
-                id="company"
-                placeholder="e.g., TechCorp Inc."
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
+              <JobInput
+                label="Company (optional)"
+                {...register("company")}
+                placeholder="Enter Company Name"
               />
+              <p className="text-red-500">{errors.company?.message}</p>
             </div>
           </div>
 
@@ -133,67 +101,21 @@ const AnalysisForm = ({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isAnalyzing}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={!selectedResume || !jobDescription}>
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Run Analysis
-            </Button>
+             <IsAnalyzingButton
+              isAnalyzing={isAnalyzing}
+              selectedResumeId={selectedResumeId}
+              disabled={isAnalyzing || !selectedResumeId}
+
+            />
           </div>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
 };
 
-// Circular Progress Component
-const CircularProgress = ({
-  score,
-  size = 80,
-}: {
-  score: number;
-  size?: number;
-}) => {
-  const radius = (size - 8) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
-
-  const getScoreColor = (score: number) => {
-    if (score >= 75) return "text-green-600";
-    if (score >= 50) return "text-yellow-600";
-    return "text-red-600";
-  };
-
-  return (
-    <div className="relative inline-flex items-center justify-center">
-      <svg width={size} height={size} className="transform -rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="transparent"
-          className="text-gray-200"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="transparent"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          className={getScoreColor(score)}
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className={`absolute text-lg font-bold ${getScoreColor(score)}`}>
-        {score}%
-      </span>
-    </div>
-  );
-};
-export { AnalysisForm, CircularProgress };
+export default AnalysisForm;

@@ -5,16 +5,21 @@ import { Plus } from "lucide-react";
 
 import ResumeTable from "./ResumeTable";
 import MobileResumeCards from "./MobileResumeCards";
-import EmptyState from "./EmptyState";
 import UploadResumeCard from "./UploadResumeCard";
 import FileUploader from "../../Home/components/FileUploader";
-
+import { useFetchResumes } from "../../Home/queries/resumeQuery";
+import { GetResumeListGetResumeParams, Resume } from "@/api/models";
+import { useState } from "react";
+import Pagination from "@/components/ui/pagination";
 export default function ResumePage() {
-  const resumes = [
-    { id: 1, name: "Resume1.pdf", date: "2024-01-15", status: "Analyzed" },
-    { id: 2, name: "Resume2.docx", date: "2024-01-14", status: "Pending" },
-  ];
+  const [paginationState, setPaginationState] = useState<GetResumeListGetResumeParams>({
+    page: 1,
+    perPage: 10,
+  });
 
+  const { data, isLoading } = useFetchResumes(paginationState);
+  const resumes: Resume[] = data?.resumes || [];
+  const totalPages = data?.pagination?.totalPages ?? 1;
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -47,10 +52,6 @@ export default function ResumePage() {
           <div className="lg:col-span-8">
             <Card>
               <CardContent className="p-6">
-                {resumes.length === 0 ? (
-                  <EmptyState />
-                ) : (
-                  <>
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-lg font-semibold">
                         Your Resumes ({resumes.length})
@@ -59,15 +60,22 @@ export default function ResumePage() {
 
                     {/* Desktop Table */}
                     <div className="hidden md:block">
-                      <ResumeTable resumes={resumes} />
+                      <ResumeTable resumes={resumes} isLoading={isLoading}/>
                     </div>
 
                     {/* Mobile Cards */}
                     <div className="md:hidden">
-                      <MobileResumeCards resumes={resumes} />
+                      <MobileResumeCards resumes={resumes} isLoading={isLoading}/>
                     </div>
-                  </>
-                )}
+
+                    {/* Pagination */}
+                    <div className="mt-4">
+                      <Pagination
+                        currentPage={paginationState.page ?? 1}
+                        totalPages={totalPages}
+                        onPageChange={(page) => setPaginationState((s) => ({ ...(s || {}), page }))}
+                      />
+                    </div>
               </CardContent>
             </Card>
           </div>

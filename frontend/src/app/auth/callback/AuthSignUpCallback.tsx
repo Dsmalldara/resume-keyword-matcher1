@@ -17,17 +17,8 @@ export default function AuthSignUpCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Check if there's a token in the URL (from email verification)
-        const hasToken =
-          searchParams.get("token") || searchParams.get("access_token");
-
-        if (!hasToken) {
-          throw new Error(
-            "Invalid authentication link. Please use the link from your email.",
-          );
-        }
-
-        const { data, error } = await supabase.auth.getSession();
+  
+      const { data, error } = await supabase.auth.getSession();
 
         if (error) {
           throw error;
@@ -39,7 +30,7 @@ export default function AuthSignUpCallback() {
 
           // Store the access token
           storeAccessToken(data.session.access_token);
-
+          console.log(data.session.access_token)
           setTimeout(() => {
             router.push("/");
           }, 2000);

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "ESNext",
+    "lib": ["esnext"],
+    "strict": true,
+    "moduleResolution": "node",
+    "noEmit": true,
+    "types": ["deno.ns"],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true 
+  }
+}

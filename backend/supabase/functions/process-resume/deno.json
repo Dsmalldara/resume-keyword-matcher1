@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "ai": "npm:ai@^3.0.0",
+    "@ai-sdk/google": "npm:@ai-sdk/google@^1.0.0",
+    "@ai-sdk/groq": "npm:@ai-sdk/groq@^1.0.0",
+    "mammoth": "npm:mammoth@^1.6.0",
+    "pdfjs-dist": "npm:pdfjs-dist@^4.0.0"
+  }
+}

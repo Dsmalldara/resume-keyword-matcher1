@@ -1,27 +1,25 @@
+"use client"
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Upload,
-  FileText,
-  TrendingUp,
-  Clock,
-  BarChart3,
-  Plus,
-} from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader,  CardTitle,} from "@/components/ui/card";
+import { Upload, FileText, TrendingUp, Clock, BarChart3, Plus,} from "lucide-react";
 import ScoreCard from "./ScoreCard";
 import ResumeContentGrid from "../../resumes/components/ResumeContentGrid";
-import ResumeItem from "../../resumes/components/ResumeItem";
-import { recentActivities, stats } from "./mocks";
+import {  stats } from "./mocks";
+import RecentActivitySection from "../../resumes/components/RecentActivitySection";
+import QuickAction from "./QuickAction";
+import { useRef, useState } from "react";
+import { useResumeCount } from "@/hooks/useResumeCount";
+import QuickActionSection from "./QuickActionSection";
+import QuickStats from "./QuickStats";
 import FileUploader from "./FileUploader";
+import useGetAverageImprovementInsights, { useGetBestMatchScore, useGetJobAnalysisInsights } from "../queries/insightsQuery";
 
 export default function HomePage() {
+  const resumeSectionRef = useRef<HTMLDivElement | null>(null);
+  const {resumeCount, isLoading:isResumeCountLoading, isError:isResumeError} = useResumeCount();
+  const {data: averageImprovementData, isLoading:isAverageImprovementLoading, isError:isAverageImprovementError} = useGetAverageImprovementInsights()
+  const {data:analysisInsights, isLoading:isAnalysisInsightsLoading, isError:isAnalysisInsightsError} = useGetJobAnalysisInsights()
+  const {data: bestMatchData, isLoading:isBestMatchLoading, isError:isBestMatchError} = useGetBestMatchScore()
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="py-7.5 mx-7.5 space-y-7.5">
@@ -30,10 +28,10 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-4xl font-bold">Home</h1>
             <div className="flex gap-3">
-              <Button className="bg-gradient-to-r from-white- to-gray-400 hover:from-gray-100 hover:to-gray-400 shadow-lg hover:shadow-xl transition-all duration-200">
-                <Plus className="w-4 h-4 mr-2" />
-                Quick Action
-              </Button>
+              <QuickAction onAddResume={() => {
+                  console.log('Ref current:', resumeSectionRef.current);
+                  resumeSectionRef.current?.scrollIntoView({behavior: 'smooth'});
+                }} />
             </div>
           </div>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
@@ -44,34 +42,47 @@ export default function HomePage() {
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <ScoreCard
-            stats={{ overallScore: 85, avgImprovement: 12 }}
+            stats={{ overallScore: `${averageImprovementData?.overallScore ?? 0}%`, avgImprovement: averageImprovementData?.AvgImprovement ?? undefined }}
             title="Average Match Score"
             description="Across all resumes"
+            isError={isAverageImprovementError}
+            isLoading={isAverageImprovementLoading}
+            icon={Upload}
+            showImprovement={true}
           />
 
           <ScoreCard
-            stats={{ overallScore: 24, avgImprovement: 0 }}
+            stats={{ overallScore: resumeCount, avgImprovement: 0 }}
             title="Total Resumes"
             description="Ready for matching"
             colorVariant="blue"
             icon={FileText}
             showImprovement={false}
+            isLoading={isResumeCountLoading}
+            isError={isResumeError}
           />
-
+          
           <ScoreCard
-            stats={{ overallScore: 156, avgImprovement: 23 }}
+            stats={{ overallScore: `${analysisInsights?.jobsAnalyzed}`, avgImprovement: 0 }}
             title="Jobs Analyzed"
-            description="This month"
+            description="Total Jobs Analyzed"
             colorVariant="purple"
             icon={BarChart3}
+            showImprovement={false}
+            isLoading={isAnalysisInsightsLoading}
+            isError={isAnalysisInsightsError}
+
           />
 
           <ScoreCard
-            stats={{ overallScore: 94, avgImprovement: 8 }}
+            stats={{ overallScore: `${bestMatchData?.bestMatch}%`, avgImprovement: 0 }}
             title="Best Match"
             description="Personal record"
             colorVariant="amber"
             icon={TrendingUp}
+            isLoading={isBestMatchLoading}
+            isError={isBestMatchError}
+            showImprovement={false}
           />
         </div>
 
@@ -97,46 +108,11 @@ export default function HomePage() {
           </ResumeContentGrid>
 
           {/* Quick Actions */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border-0 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                <Plus className="w-5 h-5" />
-                Quick Actions
-              </CardTitle>
-              <CardDescription>
-                Get started with your next optimization
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FileUploader />
-              <Button
-                variant="outline"
-                className="w-full border-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 h-12"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Add Job Description
-              </Button>
-              <div className="pt-4 border-t">
-                <h4 className="font-medium text-sm text-slate-700 dark:text-slate-300 mb-3">
-                  Quick Stats
-                </h4>
-                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                  <div className="flex justify-between">
-                    <span>This week:</span>
-                    <span className="font-medium">
-                      {stats.weeklyJobs} jobs analyzed
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Active resumes:</span>
-                    <span className="font-medium">
-                      {stats.totalResumes} files
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <QuickActionSection >
+             <FileUploader ref={resumeSectionRef} />
+          </QuickActionSection>
+          
+       <QuickStats stats={stats}  />
         </div>
 
         {/* Recent Activities */}
@@ -152,15 +128,14 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
-                <div key={index} className="">
-                  <ResumeItem recentActivities={activity} />
+                <div  className="">
+                 <RecentActivitySection />
                 </div>
-              ))}
+
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="ghost" className="w-full">
+            <Button  className="w-full md:w-fit mx-auto justify-center">
               View All Activity
             </Button>
           </CardFooter>
@@ -169,3 +144,4 @@ export default function HomePage() {
     </div>
   );
 }
+

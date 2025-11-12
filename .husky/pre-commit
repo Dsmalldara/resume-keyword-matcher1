@@ -1,1 +1,8 @@
-pnpm test
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run frontend lint and staged-file fixes before commit (backend lint may not be configured)
+pnpm run lint:frontend
+
+# Run lint-staged to auto-fix staged files (uses root lint-staged config)
+npx --no-install lint-staged || true

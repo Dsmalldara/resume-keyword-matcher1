@@ -8,6 +8,8 @@ interface Analysis {
   gaps: string[];
   nextSteps: string;
 }
+
+
 interface AnalysisResult extends Analysis {
   id: number;
   dateAnalyzed: string;
@@ -20,3 +22,4 @@ interface AnalysisModalProps {
 }
 
 export type { Analysis, AnalysisModalProps, AnalysisResult };
+

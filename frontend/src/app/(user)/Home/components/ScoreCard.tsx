@@ -1,18 +1,20 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Target, ArrowUp, LucideIcon } from "lucide-react";
+import { Target, ArrowUp, ArrowDown } from "lucide-react";
 
 type ColorVariant = "emerald" | "blue" | "purple" | "amber" | "rose" | "indigo";
 
 interface ScoreCardProps {
   stats: {
-    overallScore: number;
+    overallScore: number | string;
     avgImprovement: number;
   };
   title?: string;
   description?: string;
   colorVariant?: ColorVariant;
-  icon?: LucideIcon;
+  icon?: React.ComponentType<{ className?: string }>;
   showImprovement?: boolean;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
 const colorClasses = {
@@ -73,6 +75,8 @@ function ScoreCard({
   colorVariant = "emerald",
   icon: Icon = Target,
   showImprovement = true,
+  isLoading = false,
+  isError = false,
 }: ScoreCardProps) {
   const colors = colorClasses[colorVariant];
 
@@ -82,26 +86,59 @@ function ScoreCard({
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className={`text-sm font-medium ${colors.title}`}>
-            {title}
-          </CardTitle>
-          <Icon className={`w-5 h-5 ${colors.icon}`} />
+          {isLoading ? (
+            <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />
+          ) : (
+            <CardTitle className={`text-sm font-medium ${colors.title}`}>
+              {title}
+            </CardTitle>
+          )}
+          {isLoading ? (
+            <div className="w-5 h-5 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />
+          ) : (
+            <Icon className={`w-5 h-5 ${colors.icon}`} />
+          )}
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="flex items-baseline gap-2">
-          <span className={`text-3xl font-bold ${colors.score}`}>
-            {stats.overallScore}%
+        {isLoading ? (
+          <div className="space-y-2">
+            <div className="h-9 w-20 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-3 w-28 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        ) : (
+          <>
+            <div className="flex items-baseline gap-2">
+              <span className={`text-3xl font-bold ${colors.score} transition-all duration-300`}>
+                {isError ? "—" : stats.overallScore}
+              </span>
+        {showImprovement && !isError && (
+          <span
+            className={`flex items-center text-sm ${colors.improvement} font-medium`}
+          >
+            {stats.avgImprovement > 0 && (
+              <div className="flex">
+                <ArrowUp className="w-4 h-4 mr-1" /> +{stats.avgImprovement}%
+              </div>
+            )}
+            {stats.avgImprovement < 0 && (
+              <div className="flex text-red-500">
+                <ArrowDown className="w-4 h-4 mr-1" /> {stats.avgImprovement}%
+              </div>
+            )}
+            {stats.avgImprovement === 0 && (
+              <div className="flex">
+                <ArrowUp className="w-4 h-4 mr-1 opacity-0" /> 0%
+              </div>
+            )}
           </span>
-          {showImprovement && (
-            <span
-              className={`flex items-center text-sm ${colors.improvement} font-medium`}
-            >
-              <ArrowUp className="w-3 h-3 mr-1" />+{stats.avgImprovement}%
-            </span>
-          )}
-        </div>
-        <p className={`${colors.description} text-xs mt-1`}>{description}</p>
+        )}
+            </div>
+            <p className={`${colors.description} text-xs mt-1`}>
+              {isError ? "Failed to load data" : description}
+            </p>
+          </>
+        )}
       </CardContent>
     </Card>
   );
