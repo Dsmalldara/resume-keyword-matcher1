@@ -35,7 +35,11 @@ const generateWithRetry = async (prompt: string, retries: number = 2): Promise<s
 
       return text;    
     } catch (error) {
-      if (i === retries - 1) throw new Error("Max retries reached", { cause: error });
+      if (i === retries - 1) {
+  const err = new Error("Max retries reached");
+  (err as any).cause = error;
+  throw err;
+}
 
       const delay = 1000 * Math.pow(2, i); // Exponential backoff: 1s, 2s, 4s, ...
       logger.warn(`Generation attempt ${i + 1} failed, retrying in ${delay}ms...`);
