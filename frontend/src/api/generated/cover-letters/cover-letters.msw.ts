@@ -82,7 +82,7 @@ export const getGetCoverlettersLettersSingleIdResponseMock = (
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
-  coverLetter: faker.helpers.arrayElement([{}, undefined]),
+  coverLetter: faker.helpers.arrayElement([[], undefined]),
   ...overrideResponse,
 });
 

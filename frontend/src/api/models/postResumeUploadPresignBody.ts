@@ -9,6 +9,10 @@
 export type PostResumeUploadPresignBody = {
   /** Name of the file to upload */
   filename: string;
+  /** MIME type of the file */
+  type: string;
+  /** Size of the file in bytes */
+  size: number;
   /** User's access token for authentication */
   access_token: string;
 };

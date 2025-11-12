@@ -64,7 +64,6 @@ const baseMetadata: Metadata = {
   // Essential SEO meta tags
   robots:
     "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
-  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
 
   // Structured data hints
   category: "Business/Career Tools",

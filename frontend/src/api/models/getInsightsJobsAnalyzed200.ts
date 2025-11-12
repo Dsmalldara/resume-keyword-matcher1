@@ -9,4 +9,5 @@ import type { GetInsightsJobsAnalyzed200Data } from "./getInsightsJobsAnalyzed20
 
 export type GetInsightsJobsAnalyzed200 = {
   data?: GetInsightsJobsAnalyzed200Data;
+  jobsAnalyzed?: number;
 };

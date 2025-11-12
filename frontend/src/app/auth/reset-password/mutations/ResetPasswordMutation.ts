@@ -1,4 +1,4 @@
-import { usePostAuthResetPassword } from "@/api/generated/authentication/authentication";
+import { usePostAuthForgotPassword } from "@/api/generated/authentication/authentication";
 import { usePostAuthVerifyResetToken } from "@/api/generated/authentication/authentication";
 
 export const useVerifyResetToken = () => {
@@ -11,7 +11,7 @@ export const useVerifyResetToken = () => {
   });
 };
 export const useCreateResetPassword = () => {
-  return usePostAuthResetPassword({
+  return usePostAuthForgotPassword({
     mutation: {
       retry: 2,
       retryDelay: 1000,

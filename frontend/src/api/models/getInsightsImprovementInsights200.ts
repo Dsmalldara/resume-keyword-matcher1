@@ -11,4 +11,5 @@ export type GetInsightsImprovementInsights200 = {
   overallScore?: number;
   /** Percentage improvement compared to previous analyses */
   Improvement?: number;
+  AvgImprovement?: number;
 };

@@ -1,10 +1,24 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader,  CardTitle,} from "@/components/ui/card";
-import { Upload, FileText, TrendingUp, Clock, BarChart3, Plus,} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Upload,
+  FileText,
+  TrendingUp,
+  Clock,
+  BarChart3,
+  Plus,
+} from "lucide-react";
 import ScoreCard from "./ScoreCard";
 import ResumeContentGrid from "../../resumes/components/ResumeContentGrid";
-import {  stats } from "./mocks";
+import { stats } from "./mocks";
 import RecentActivitySection from "../../resumes/components/RecentActivitySection";
 import QuickAction from "./QuickAction";
 import { useRef, useState } from "react";
@@ -12,14 +26,33 @@ import { useResumeCount } from "@/hooks/useResumeCount";
 import QuickActionSection from "./QuickActionSection";
 import QuickStats from "./QuickStats";
 import FileUploader from "./FileUploader";
-import useGetAverageImprovementInsights, { useGetBestMatchScore, useGetJobAnalysisInsights } from "../queries/insightsQuery";
+import useGetAverageImprovementInsights, {
+  useGetBestMatchScore,
+  useGetJobAnalysisInsights,
+} from "../queries/insightsQuery";
 
 export default function HomePage() {
   const resumeSectionRef = useRef<HTMLDivElement | null>(null);
-  const {resumeCount, isLoading:isResumeCountLoading, isError:isResumeError} = useResumeCount();
-  const {data: averageImprovementData, isLoading:isAverageImprovementLoading, isError:isAverageImprovementError} = useGetAverageImprovementInsights()
-  const {data:analysisInsights, isLoading:isAnalysisInsightsLoading, isError:isAnalysisInsightsError} = useGetJobAnalysisInsights()
-  const {data: bestMatchData, isLoading:isBestMatchLoading, isError:isBestMatchError} = useGetBestMatchScore()
+  const {
+    resumeCount,
+    isLoading: isResumeCountLoading,
+    isError: isResumeError,
+  } = useResumeCount();
+  const {
+    data: averageImprovementData,
+    isLoading: isAverageImprovementLoading,
+    isError: isAverageImprovementError,
+  } = useGetAverageImprovementInsights();
+  const {
+    data: analysisInsights,
+    isLoading: isAnalysisInsightsLoading,
+    isError: isAnalysisInsightsError,
+  } = useGetJobAnalysisInsights();
+  const {
+    data: bestMatchData,
+    isLoading: isBestMatchLoading,
+    isError: isBestMatchError,
+  } = useGetBestMatchScore();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="py-7.5 mx-7.5 space-y-7.5">
@@ -28,10 +61,14 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-4xl font-bold">Home</h1>
             <div className="flex gap-3">
-              <QuickAction onAddResume={() => {
-                  console.log('Ref current:', resumeSectionRef.current);
-                  resumeSectionRef.current?.scrollIntoView({behavior: 'smooth'});
-                }} />
+              <QuickAction
+                onAddResume={() => {
+                  console.log("Ref current:", resumeSectionRef.current);
+                  resumeSectionRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }}
+              />
             </div>
           </div>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
@@ -42,7 +79,10 @@ export default function HomePage() {
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <ScoreCard
-            stats={{ overallScore: `${averageImprovementData?.overallScore ?? 0}%`, avgImprovement: averageImprovementData?.AvgImprovement ?? undefined }}
+            stats={{
+              overallScore: `${averageImprovementData?.overallScore ?? 0}%`,
+              avgImprovement: averageImprovementData?.AvgImprovement ?? 0,
+            }}
             title="Average Match Score"
             description="Across all resumes"
             isError={isAverageImprovementError}
@@ -61,9 +101,12 @@ export default function HomePage() {
             isLoading={isResumeCountLoading}
             isError={isResumeError}
           />
-          
+
           <ScoreCard
-            stats={{ overallScore: `${analysisInsights?.jobsAnalyzed}`, avgImprovement: 0 }}
+            stats={{
+              overallScore: `${analysisInsights?.jobsAnalyzed}`,
+              avgImprovement: 0,
+            }}
             title="Jobs Analyzed"
             description="Total Jobs Analyzed"
             colorVariant="purple"
@@ -71,11 +114,13 @@ export default function HomePage() {
             showImprovement={false}
             isLoading={isAnalysisInsightsLoading}
             isError={isAnalysisInsightsError}
-
           />
 
           <ScoreCard
-            stats={{ overallScore: `${bestMatchData?.bestMatch}%`, avgImprovement: 0 }}
+            stats={{
+              overallScore: `${bestMatchData?.bestMatch}%`,
+              avgImprovement: 0,
+            }}
             title="Best Match"
             description="Personal record"
             colorVariant="amber"
@@ -108,11 +153,11 @@ export default function HomePage() {
           </ResumeContentGrid>
 
           {/* Quick Actions */}
-          <QuickActionSection >
-             <FileUploader ref={resumeSectionRef} />
+          <QuickActionSection>
+            <FileUploader ref={resumeSectionRef} />
           </QuickActionSection>
-          
-       <QuickStats stats={stats}  />
+
+          <QuickStats stats={stats} />
         </div>
 
         {/* Recent Activities */}
@@ -128,14 +173,13 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-                <div  className="">
-                 <RecentActivitySection />
-                </div>
-
+              <div className="">
+                <RecentActivitySection />
+              </div>
             </div>
           </CardContent>
           <CardFooter>
-            <Button  className="w-full md:w-fit mx-auto justify-center">
+            <Button className="w-full md:w-fit mx-auto justify-center">
               View All Activity
             </Button>
           </CardFooter>
@@ -144,4 +188,3 @@ export default function HomePage() {
     </div>
   );
 }
-
