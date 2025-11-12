@@ -6,7 +6,6 @@
     "strict": true,
     "moduleResolution": "node",
     "noEmit": true,
-    "types": ["node"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true 
   }
