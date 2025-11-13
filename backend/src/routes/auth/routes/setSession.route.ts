@@ -3,7 +3,7 @@
  * /auth/set-session:
  *   post:
  *     summary: Set session from OAuth callback
- *     description: Stores refresh token in httpOnly cookie after OAuth authentication
+ *     description: Stores refresh token in httpOnly cookie after OAuth authentication. Only called once during OAuth callback with tokens from Supabase.
  *     tags:
  *       - Authentication
  *     requestBody:
@@ -15,10 +15,10 @@
  *             properties:
  *               refresh_token:
  *                 type: string
- *                 description: Refresh token from OAuth provider
+ *                 description: Refresh token from Supabase OAuth
  *               access_token:
  *                 type: string
- *                 description: Access token from OAuth provider
+ *                 description: Access token from Supabase OAuth (for reference, not used on backend)
  *             required:
  *               - refresh_token
  *               - access_token
@@ -59,11 +59,11 @@ const router = Router();
 
 router.post("/set-session", async (req: Request, res: Response) => {
   try {
-    const { refresh_token, access_token } = req.body;
+    const { refresh_token } = req.body;
 
-    if (!refresh_token || !access_token) {
+    if (!refresh_token) {
       return res.status(400).json({
-        error: "Missing required tokens: refresh_token and access_token",
+        error: "Missing required token: refresh_token",
       });
     }
 

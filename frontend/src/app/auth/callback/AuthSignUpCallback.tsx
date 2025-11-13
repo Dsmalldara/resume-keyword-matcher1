@@ -39,7 +39,6 @@ export default function AuthSignUpCallback() {
               },
               body: JSON.stringify({
                 refresh_token: data.session.refresh_token,
-                access_token: data.session.access_token,
               }),
             },
           );
