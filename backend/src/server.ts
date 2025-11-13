@@ -29,13 +29,6 @@ const allowedOrigins = [
   "http://localhost:3001",
 ].filter(Boolean);
 
-// Log at startup
-logger.info("=== CORS DEBUG ===");
-logger.info(`PRODUCTION_URL: ${process.env.PRODUCTION_URL}`);
-logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
-logger.info(`Allowed Origins: ${JSON.stringify(allowedOrigins)}`);
-logger.info("==================");
-
 const corsOptions = {
   origin: (
     origin: string | undefined,
