@@ -21,11 +21,19 @@ import CoverLetterRoutes from "./routes/coverletters/index";
 dotenv.config();
 
 const app = express();
+
+// Build allowed origins list
+const allowedOrigins = [
+  process.env.PRODUCTION_URL,
+  "http://localhost:3000",
+  "http://localhost:3001",
+].filter(Boolean);
+
 // Log at startup
 logger.info("=== CORS DEBUG ===");
-logger.info(`Frontend_Url: ${process.env.Frontend_Url}`);
 logger.info(`PRODUCTION_URL: ${process.env.PRODUCTION_URL}`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
+logger.info(`Allowed Origins: ${JSON.stringify(allowedOrigins)}`);
 logger.info("==================");
 
 const corsOptions = {
@@ -33,15 +41,17 @@ const corsOptions = {
     origin: string | undefined,
     callback: (err: Error | null, allow?: boolean) => void,
   ) => {
-    const allowedOrigins = [
-      process.env.PRODUCTION_URL,
-      "http://localhost:3000",
-      "http://localhost:3001",
-    ].filter(Boolean);
+    // Log the incoming origin
+    logger.info(
+      `CORS Request from origin: ${origin || "no origin (same-origin or tool)"}`,
+    );
 
     if (!origin || allowedOrigins.includes(origin)) {
+      logger.info(`✓ CORS allowed for: ${origin || "no origin"}`);
       callback(null, true);
     } else {
+      logger.error(`✗ CORS BLOCKED for: ${origin}`);
+      logger.error(`Allowed origins are: ${JSON.stringify(allowedOrigins)}`);
       callback(new Error("Not allowed by CORS"));
     }
   },
@@ -51,6 +61,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   exposedHeaders: ["Set-Cookie"],
 };
+
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(helmet());
@@ -73,6 +84,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
       path: req.path,
       statusCode,
       duration: `${duration}ms`,
+      origin: req.headers.origin,
     };
 
     if (statusCode >= 500) {
@@ -86,6 +98,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
   next();
 });
+
 app.use(
   "/api-docs",
   swaggerUi.serve,
