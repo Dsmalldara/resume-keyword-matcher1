@@ -34,7 +34,6 @@ const corsOptions = {
     origin: string | undefined,
     callback: (err: Error | null, allow?: boolean) => void,
   ) => {
-    // Log the incoming origin
     logger.info(
       `CORS Request from origin: ${origin || "no origin (same-origin or tool)"}`,
     );
