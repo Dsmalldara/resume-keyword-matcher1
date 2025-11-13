@@ -15,22 +15,35 @@ const publicRoutes = [
   "/auth/callback",
 ];
 
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
-
-async function verifySession(refreshToken: string): Promise<boolean> {
+async function verifySession(request: NextRequest): Promise<boolean> {
   try {
-    const { data, error } = await supabase.auth.getUser(refreshToken);
-    return !error && !!data.user;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000";
+
+    // Create a new request with cookies to send to backend
+    const response = await fetch(`${baseUrl}/auth/verify-session`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        // Forward the cookies from the original request
+        Cookie: request.headers.get("cookie") || "",
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`[verifySession] Backend returned ${response.status}`);
+      return false;
+    }
+
+    const data = await response.json();
+    return data.valid === true;
   } catch (error) {
     console.error(`[verifySession] Error:`, error);
     return false;
   }
 }
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   console.log(`[Middleware] Processing request to: ${pathname}`);
@@ -59,7 +72,7 @@ export async function middleware(request: NextRequest) {
     }
 
     console.log(`[Middleware] Verifying session with backend...`);
-    const isValid = await verifySession(refreshToken);
+    const isValid = await verifySession(request);
     console.log(`[Middleware] Session valid: ${isValid}`);
 
     if (!isValid) {
