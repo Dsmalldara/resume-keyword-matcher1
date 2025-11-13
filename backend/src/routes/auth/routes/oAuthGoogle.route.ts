@@ -1,4 +1,3 @@
-
 /**
  * @swagger
  * /auth/google:
@@ -27,20 +26,17 @@ import logger from "../../../../utils/logger";
 // OAUTH ROUTES
 const router = Router();
 
-
-
-
-router.get('/google', oauthLimiter, async (req: Request, res: Response) => {
+router.get("/google", oauthLimiter, async (req: Request, res: Response) => {
   try {
-    const { data, error } : OAuthResponse = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+    const { data, error }: OAuthResponse = await supabase.auth.signInWithOAuth({
+      provider: "google",
       options: {
-        redirectTo: `${process.env.SERVER_URL || 'http://localhost:3000'}/auth/callback`,
+        redirectTo: `${process.env.SERVER_URL}/auth/callback`,
         queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        }
-      }
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
     });
 
     if (error) throw error;
@@ -48,11 +44,9 @@ router.get('/google', oauthLimiter, async (req: Request, res: Response) => {
     // Redirect user to Google OAuth page
     res.redirect(data.url);
   } catch (error: any) {
-    logger.error('Error initiating Google OAuth', { error });
+    logger.error("Error initiating Google OAuth", { error });
     res.status(500).json({ error: error.message });
   }
 });
 
-
-
-export default router
+export default router;
