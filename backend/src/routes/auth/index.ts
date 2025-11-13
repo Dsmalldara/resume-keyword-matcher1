@@ -7,7 +7,7 @@ import ResetPasswordRoute from "./routes/resetPassword.route";
 import OAuthGoogleCallbackRoute from "./routes/OAuthGoogleCallback.route";
 import OAuthGoogleRoute from "./routes/oAuthGoogle.route";
 import ProfileSyncRoute from "./routes/profileSync.route";
-import ValidateRoute from "./routes/validate.route";
+
 import { Router } from "express";
 
 const router = Router();
@@ -20,5 +20,4 @@ router.use(ResetPasswordRoute);
 router.use(OAuthGoogleRoute);
 router.use(OAuthGoogleCallbackRoute);
 router.use(ProfileSyncRoute);
-router.use(ValidateRoute);
 export default router;

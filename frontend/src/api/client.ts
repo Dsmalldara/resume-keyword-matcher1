@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { redirect } from "next/navigation";
 
 const AXIOS_INSTANCE = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -10,11 +9,6 @@ export const storeAccessToken = (newToken: string) => {
   if (typeof window !== "undefined") {
     // Store in sessionStorage for client-side access
     sessionStorage.setItem("access_token", newToken);
-
-    // Also store in a cookie for server-side middleware validation
-    document.cookie = `access_token=${newToken}; path=/; ${
-      process.env.NODE_ENV === "production" ? "Secure;" : ""
-    } SameSite=Lax`;
   }
 };
 
@@ -58,7 +52,17 @@ AXIOS_INSTANCE.interceptors.response.use(
           `Bearer ${data.access_token}`;
         return AXIOS_INSTANCE(originalRequest);
       } catch (refreshError) {
-        redirect("/auth/login");
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("access_token");
+          document.cookie =
+            "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+          document.cookie =
+            "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
+          // Use window.location for client-side redirect
+          window.location.href = "/auth/login";
+        }
+
         return Promise.reject(refreshError);
       }
     }
