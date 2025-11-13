@@ -6,13 +6,18 @@
  *     description: Validates JWT expiry from refresh token without creating new tokens
  *     tags:
  *       - Authentication
- *     parameters:
- *       - in: cookie
- *         name: refresh_token
- *         required: true
- *         schema:
- *           type: string
- *         description: Refresh token stored in httpOnly cookie
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: Refresh token to validate
+ *             required:
+ *               - refreshToken
  *     responses:
  *       200:
  *         description: Session validity check completed
@@ -44,7 +49,8 @@ interface JWTPayload {
 
 router.post("/verify-session", async (req: Request, res: Response) => {
   try {
-    const refreshToken = req.cookies.refresh_token;
+    // Accept refresh token from either request body or cookie
+    const refreshToken = req.body.refreshToken || req.cookies.refresh_token;
 
     if (!refreshToken) {
       logger.warn("Missing refresh token for session verification", {

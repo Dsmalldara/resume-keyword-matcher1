@@ -20,15 +20,23 @@ async function verifySession(request: NextRequest): Promise<boolean> {
     const baseUrl =
       process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000";
 
-    // Create a new request with cookies to send to backend
+    // Extract refresh token from cookies
+    const refreshToken = request.cookies.get("refresh_token")?.value;
+
+    if (!refreshToken) {
+      console.error(
+        `[verifySession] No refresh token found in request cookies`,
+      );
+      return false;
+    }
+
+    // Send refresh token in request body to backend
     const response = await fetch(`${baseUrl}/auth/verify-session`, {
       method: "POST",
-      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        // Forward the cookies from the original request
-        Cookie: request.headers.get("cookie") || "",
       },
+      body: JSON.stringify({ refreshToken }),
     });
 
     if (!response.ok) {
