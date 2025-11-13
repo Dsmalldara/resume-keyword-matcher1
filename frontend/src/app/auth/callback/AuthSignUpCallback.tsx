@@ -29,7 +29,20 @@ export default function AuthSignUpCallback() {
 
           // Store the access token
           storeAccessToken(data.session.access_token);
-          console.log(data.session.access_token);
+          await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/set-session`,
+            {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                refresh_token: data.session.refresh_token,
+                access_token: data.session.access_token,
+              }),
+            },
+          );
 
           setTimeout(() => {
             router.push("/");

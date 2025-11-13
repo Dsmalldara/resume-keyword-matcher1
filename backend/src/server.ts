@@ -21,13 +21,19 @@ import CoverLetterRoutes from "./routes/coverletters/index";
 dotenv.config();
 
 const app = express();
+// Log at startup
+logger.info("=== CORS DEBUG ===");
+logger.info(`Frontend_Url: ${process.env.Frontend_Url}`);
+logger.info(`PRODUCTION_URL: ${process.env.PRODUCTION_URL}`);
+logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
+logger.info("==================");
+
 const corsOptions = {
   origin: (
     origin: string | undefined,
     callback: (err: Error | null, allow?: boolean) => void,
   ) => {
     const allowedOrigins = [
-      process.env.Frontend_Url,
       process.env.PRODUCTION_URL,
       "http://localhost:3000",
       "http://localhost:3001",
