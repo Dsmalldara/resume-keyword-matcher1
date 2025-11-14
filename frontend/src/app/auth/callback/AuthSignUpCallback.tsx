@@ -26,22 +26,8 @@ export default function AuthSignUpCallback() {
         if (data.session) {
           setStatus("success");
           setMessage("Authentication successful! Redirecting...");
-
           // Store the access token
           storeAccessToken(data.session.access_token);
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/set-session`,
-            {
-              method: "POST",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                refresh_token: data.session.refresh_token,
-              }),
-            },
-          );
 
           setTimeout(() => {
             router.push("/");

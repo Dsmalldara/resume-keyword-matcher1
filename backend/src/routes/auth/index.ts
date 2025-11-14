@@ -6,9 +6,6 @@ import ForgotPasswordRoute from "./routes/forgotPassword.route";
 import ResetPasswordRoute from "./routes/resetPassword.route";
 import OAuthGoogleCallbackRoute from "./routes/OAuthGoogleCallback.route";
 import OAuthGoogleRoute from "./routes/oAuthGoogle.route";
-import ProfileSyncRoute from "./routes/profileSync.route";
-import SetSessionRoute from "./routes/setSession.route";
-import VerifySessionRoute from "./routes/verifySession.route";
 
 import { Router } from "express";
 
@@ -21,7 +18,4 @@ router.use(ForgotPasswordRoute);
 router.use(ResetPasswordRoute);
 router.use(OAuthGoogleRoute);
 router.use(OAuthGoogleCallbackRoute);
-router.use(ProfileSyncRoute);
-router.use(SetSessionRoute);
-router.use(VerifySessionRoute);
 export default router;

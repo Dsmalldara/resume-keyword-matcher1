@@ -9,6 +9,8 @@ export const storeAccessToken = (newToken: string) => {
   if (typeof window !== "undefined") {
     // Store in sessionStorage for client-side access
     sessionStorage.setItem("access_token", newToken);
+    // Also store in a readable cookie for middleware access
+    document.cookie = `access_token=${newToken}; path=/; samesite=lax; secure`;
   }
 };
 
