@@ -42,6 +42,7 @@
  *                 message:
  *                   type: string
  *                   example: Upload recorded successfully
+ *
  *       400:
  *         description: Validation error, invalid filepath, or file not found
  *         content:
@@ -75,51 +76,62 @@ import prisma from "../../lib/prisma";
 import { AuthMiddleware } from "../../middleware/auth";
 import { resumeUploadCompleteValidations } from "./validations/resumeValidator";
 import { getStorageKey } from "./resumeUtils";
-const router = Router()
-router.post('/upload/complete', AuthMiddleware, resumeUploadCompleteValidations, async (req:Request, res:Response) => {
-    const { filepath, filename, size } = req.body;
-    const userId = req.user?.id!;
-    const storageKey = await getStorageKey(userId);
+const router = Router();
+router.post(
+  "/upload/complete",
+  AuthMiddleware,
+  resumeUploadCompleteValidations,
+  async (req: Request, res: Response) => {
+    try {
+      const { filepath, filename, size } = req.body;
+      const userId = req.user?.id!;
+      const storageKey = await getStorageKey(userId);
 
-    if (!storageKey) {
-        return res.status(400).json({ error: "User profile not configured for uploads" });
-    }
+      if (!storageKey) {
+        return res
+          .status(400)
+          .json({ error: "User profile not configured for uploads" });
+      }
 
-    if (!filepath.startsWith(storageKey)) {
+      if (!filepath.startsWith(storageKey)) {
         return res.status(400).json({ error: "Invalid filepath" });
-    }
+      }
 
-    // Check if a resume with the same NAME already exists for this user
-    const existingByName = await prisma.resume.findFirst({ 
-        where: { 
-            storageKey: storageKey,
-            name: filename,
-            deletedAt: null 
-        } 
-    });
-    
-    if (existingByName) {
-        return res.status(409).json({ 
-            error: "A resume with this filename already exists",
-            message: "Please rename your file or delete the existing resume first."
-        });
-    }
+      // Check if a resume with the same NAME already exists for this user
+      const existingByName = await prisma.resume.findFirst({
+        where: {
+          storageKey: storageKey,
+          name: filename,
+          deletedAt: null,
+        },
+      });
 
-    // Check if this exact filepath already exists (shouldn't happen with unique uploadIds)
-    const existingByPath = await prisma.resume.findFirst({ 
-        where: { fileUrl: filepath } 
-    });
-    
-    if (existingByPath) {
-        return res.status(409).json({ error: "Resume already exists in database" });
-    }
+      // Check if this exact filepath already exists (shouldn't happen with unique uploadIds)
+      const existingByPath = await prisma.resume.findFirst({
+        where: { fileUrl: filepath },
+      });
 
-    return res.status(200).json({ 
+      if (existingByPath || existingByName) {
+        return res
+          .status(200)
+          .json({
+            error:
+              "Resume already exists in database, may proceed under renaming",
+            exist: true,
+          });
+      }
+
+      return res.status(200).json({
         validated: true,
-        message: 'Validation passed. Ready to upload to storage.',
-        metadata: { filename, filepath, size }
-    });
-});
-
+        message: "Validation passed. Ready to upload to storage.",
+        exist: false,
+        metadata: { filename, filepath, size },
+      });
+    } catch (error) {
+      console.error("Error completing resume upload:", error);
+      return res.status(500).json({ error: "Server error" });
+    }
+  },
+);
 
 export default router;

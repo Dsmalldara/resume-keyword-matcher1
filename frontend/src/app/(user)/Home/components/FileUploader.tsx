@@ -10,6 +10,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ResumeExistsDialog } from "@/components/ResumeExistsDialog";
 import { toast } from "sonner";
 import {
   useGetPreSignedUrlMutation,
@@ -18,11 +19,14 @@ import {
 } from "../mutations/resumeMutation";
 import { getAccessToken } from "@/api/client";
 import { getErrorMessage } from "@/lib/utils";
-import { forwardRef } from 'react';
+import { forwardRef } from "react";
 const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
   const [file, setFile] = useState<File | null>(null);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [finalUrl, setFinalUrl] = useState<string | null>(null);
+  const [resumeExists, setResumeExists] = useState<boolean>(false);
+  const [showResumeExistsDialog, setShowResumeExistsDialog] =
+    useState<boolean>(false);
   const [uploadState, setUploadState] = useState<
     "idle" | "getting-url" | "ready" | "uploading" | "success" | "error"
   >("idle");
@@ -85,14 +89,13 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
       },
       {
         onSuccess: (data) => {
-          console.log("Presigned URL received:", data);
           setSignedUrl(data.uploadUrl || null); // Adjust based on your API response
           setFinalUrl(data.filepath || null); // Adjust based on your API response
           setUploadState("ready");
+
           toast.success("File ready to upload!");
         },
         onError: (error) => {
-          console.error("Error getting presigned URL:", error);
           setUploadState("error");
           toast.error("Failed to prepare file upload");
         },
@@ -102,17 +105,9 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
 
   // Upload to Supabase bucket
   const handleUploadToSupabase = async () => {
-    console.log("🚀 FUNCTION CALLED - handleUploadToSupabase");
-    console.log("File exists:", !!file);
-    console.log("SignedUrl exists:", !!signedUrl);
-    console.log("File:", file);
-    console.log("SignedUrl:", signedUrl);
-
     if (!file || !signedUrl || !selectedFile) {
       return;
     }
-
-    console.log("✅ Proceeding with validation...");
     setUploadState("uploading");
     setUploadProgress(0);
 
@@ -128,13 +123,10 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
         },
         {
           onSuccess: async (data) => {
-            console.log("✅ Validation passed:", data);
             setUploadProgress(30);
 
             // STEP 2: Upload to Supabase ONLY if validation succeeded
             try {
-              console.log("📡 Starting Supabase upload...");
-
               const interval = setInterval(() => {
                 setUploadProgress((prev) => {
                   if (prev >= 90) {
@@ -152,21 +144,12 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
                   "Content-Type": file.type,
                 },
               });
-
-              console.log(
-                "📥 Response received:",
-                response.status,
-                response.statusText,
-              );
               clearInterval(interval);
 
               if (response.ok) {
-                console.log("✅ Upload successful!");
                 setUploadProgress(100);
                 setUploadState("success");
                 toast.success("Resume uploaded successfully!");
-                // STEP 3: Finalize upload
-                console.log("🎯 Calling uploadFinalize..."); // Add this
                 uploadFinalize({
                   data: {
                     filename: file.name,
@@ -175,20 +158,16 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
                   },
                 });
               } else {
-                console.log("❌ Upload failed");
                 const errorText = await response.text();
-                console.error("Upload failed:", response.status, errorText);
                 setUploadState("error");
                 toast.error(`Upload failed: ${response.statusText}`);
               }
             } catch (uploadError) {
-              console.error("💥 Supabase upload error:", uploadError);
               setUploadState("error");
               toast.error("Upload to storage failed.");
             }
           },
           onError: (error) => {
-          console.error("❌ Validation failed:", error);
             getErrorMessage(error);
             setUploadState("error");
             toast.error(getErrorMessage(error));
@@ -197,7 +176,6 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
         },
       );
     } catch (error) {
-      console.error("💥 Upload error (catch):", error);
       setUploadState("error");
       toast.error("Upload failed. Please check your connection.");
     }
@@ -230,10 +208,19 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
     disabled: uploadState !== "idle",
   });
 
-const fileSizeInMb = file ? (file.size / (1024 * 1024)).toFixed(2) : null;
+  const fileSizeInMb = file ? (file.size / (1024 * 1024)).toFixed(2) : null;
 
   return (
-    <div ref={ref}> 
+    <div ref={ref}>
+      <ResumeExistsDialog
+        open={resumeExists}
+        onOpenChange={setResumeExists}
+        fileName={file?.name || ""}
+        onConfirm={() => {
+          setResumeExists(false);
+          handleUploadToSupabase();
+        }}
+      />
       {uploadState === "success" && (
         <div className="space-y-4">
           <div className="flex items-center gap-3 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
@@ -278,7 +265,6 @@ const fileSizeInMb = file ? (file.size / (1024 * 1024)).toFixed(2) : null;
 
           <Button
             onClick={() => {
-              console.log("🔘 Button clicked!");
               handleUploadToSupabase();
             }}
             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200 h-12"
@@ -324,7 +310,11 @@ const fileSizeInMb = file ? (file.size / (1024 * 1024)).toFixed(2) : null;
               Upload failed. Please try again.
             </p>
           </div>
-          <Button onClick={handleRemoveFile} variant="outline" className="w-full">
+          <Button
+            onClick={handleRemoveFile}
+            variant="outline"
+            className="w-full"
+          >
             Try Again
           </Button>
         </div>
@@ -377,9 +367,8 @@ const fileSizeInMb = file ? (file.size / (1024 * 1024)).toFixed(2) : null;
       )}
     </div>
   );
-
 });
 
-FileUploader.displayName = 'FileUploader';
+FileUploader.displayName = "FileUploader";
 
 export default FileUploader;

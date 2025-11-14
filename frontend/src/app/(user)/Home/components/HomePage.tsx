@@ -11,7 +11,6 @@ import {
 import { Upload, FileText, TrendingUp, Clock, BarChart3 } from "lucide-react";
 import ScoreCard from "./ScoreCard";
 import ResumeContentGrid from "../../resumes/components/ResumeContentGrid";
-import { stats } from "./mocks";
 import RecentActivitySection from "../../resumes/components/RecentActivitySection";
 import QuickAction from "./QuickAction";
 import { useRef, useState } from "react";
@@ -141,7 +140,12 @@ export default function HomePage() {
             <FileUploader ref={resumeSectionRef} />
           </QuickActionSection>
 
-          <QuickStats stats={stats} />
+          <QuickStats
+            stats={{
+              weeklyJobs: analysisInsights?.jobsAnalyzed ?? 0,
+              totalResumes: resumeCount ?? 0,
+            }}
+          />
         </div>
 
         {/* Recent Activities */}

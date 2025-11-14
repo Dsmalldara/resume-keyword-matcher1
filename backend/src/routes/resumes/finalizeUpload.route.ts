@@ -70,7 +70,7 @@
  *               $ref: '#/components/schemas/Error'
  */
 
-import {Router,Request,Response} from "express";
+import { Router, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { logActivity } from "../../../utils/activityLogger";
 import prisma from "../../lib/prisma";
@@ -80,74 +80,93 @@ import { getStorageKey } from "./resumeUtils";
 import logger from "../../../utils/logger";
 
 const router = Router();
-router.post('/upload/finalize', AuthMiddleware, resumeUploadCompleteValidations, async (req: Request, res: Response) => {
+router.post(
+  "/upload/finalize",
+  AuthMiddleware,
+  resumeUploadCompleteValidations,
+  async (req: Request, res: Response) => {
     const validationErrors = validationResult(req);
     if (!validationErrors.isEmpty()) {
-        return res.status(400).json({ errors: validationErrors.array() });
+      return res.status(400).json({ errors: validationErrors.array() });
     }
-    
+
     const { filepath, filename, size } = req.body;
     const userId = req.user?.id!;
     const storageKey = await getStorageKey(userId);
-    const resumeId = filepath.split('/')[1]; // Extract resumeId from filepath
+    const resumeId = filepath.split("/")[1]; // Extract resumeId from filepath
 
     if (!storageKey) {
-        return res.status(400).json({ error: "User profile not configured for uploads" });
+      return res
+        .status(400)
+        .json({ error: "User profile not configured for uploads" });
     }
 
     if (!filepath.startsWith(storageKey)) {
-        return res.status(400).json({ error: "Invalid filepath" });
+      return res.status(400).json({ error: "Invalid filepath" });
     }
 
     try {
-        const profileId = (await prisma.profile.findUnique({ where: { userId } }))!.id;
-        
-        // Get next version number
-        const latestResume = await prisma.resume.findFirst({
-            where: { storageKey, deletedAt: null },
-            orderBy: { version: 'desc' },
-        });
-        const newVersion = (latestResume?.version || 0) + 1;
+      const profileId = (await prisma.profile.findUnique({
+        where: { userId },
+      }))!.id;
 
-        // Create resume record
-        const resume = await prisma.resume.create({
-            data: {
-                id: resumeId,
-                storageKey,
-                profileId,
-                name: filename,
-                fileUrl: filepath,
-                fileSize: size,
-                version: newVersion,
-                isActive: true,
-            },
-        });
+      const existingResumeId = await prisma.resume.findFirst({
+        where: {
+          storageKey: storageKey,
+          fileUrl: filepath,
+        },
+        select: {
+          id: true,
+        },
+      });
+      // Create resume record
+      const resume = await prisma.resume.upsert({
+        where: { id: existingResumeId ? existingResumeId.id : resumeId },
+        create: {
+          id: resumeId,
+          storageKey,
+          profileId,
+          name: filename,
+          fileUrl: filepath,
+          fileSize: size,
+          version: 1,
+          isActive: true,
+        },
+        update: {
+          storageKey,
+          profileId,
+          name: filename,
+          fileUrl: filepath,
+          fileSize: size,
+          version: { increment: 1 },
+          isActive: true,
+        },
+      });
 
-        // Log activity
-        await logActivity({
-            profileId,
-            type: 'RESUME_UPLOAD',
-            entityId: resume.id,
-            entityType: 'resume',
-            message: `${filename} uploaded`,
-            metadata: {
-                filename,
-                version: newVersion,
-                fileSize: size,
-                filepath,
-            }
-        });
+      // Log activity
+      await logActivity({
+        profileId,
+        type: "RESUME_UPLOAD",
+        entityId: resume.id,
+        entityType: "resume",
+        message: `${filename} uploaded`,
+        metadata: {
+          filename,
+          version: resume.version,
+          fileSize: size,
+          filepath,
+        },
+      });
 
-        // ✅ Convert BigInt to string before sending response
-        res.status(201).json({ 
-            message: 'Upload finalized successfully', 
-        });
+      // ✅ Convert BigInt to string before sending response
+      res.status(201).json({
+        message: "Upload finalized successfully",
+      });
     } catch (err) {
-        logger.error('Error finalizing upload', { err });
-        res.status(500).json({ error: 'Failed to finalize upload' });
+      logger.error("Error finalizing upload", { err });
+      res.status(500).json({ error: "Failed to finalize upload" });
     }
-});
-
-
+  },
+);
 
 export default router;

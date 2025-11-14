@@ -8,4 +8,5 @@
 
 export type PostResumeUploadComplete201 = {
   message?: string;
+  exist: boolean;
 };

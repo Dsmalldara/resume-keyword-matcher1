@@ -25,11 +25,13 @@ type MetadataProps = {
   };
 };
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://your-domain.com";
+
 const baseMetadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: {
     template: "%s | Resume Keyword Matcher - ATS Resume Optimizer",
-    default:
-      "Resume Keyword Matcher - ATS Resume Optimizer & Job Match Analyzer",
+    default: "Resume Keyword Matcher: Free ATS Optimizer & Job Score",
   },
   description:
     "Free ATS-friendly resume analyzer and keyword matcher. Optimize your resume for job applications, generate match scores, identify missing keywords, and create tailored cover letters. Beat applicant tracking systems with our AI-powered resume optimizer.",
@@ -127,7 +129,7 @@ export function generateMetadata(props?: MetadataProps): Metadata {
             alt: "Resume Keyword Matcher - ATS Resume Optimizer Tool",
           },
         ],
-      url: props?.canonical || "https://your-domain.com", // Update with your actual domain
+      url: props?.canonical || APP_URL,
     },
 
     // Enhanced Twitter cards
