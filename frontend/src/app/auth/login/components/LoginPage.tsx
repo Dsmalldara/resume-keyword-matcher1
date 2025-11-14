@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import {
   AuthButton,
   AuthContinueWithGoogle,
@@ -17,8 +16,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/utils";
+import { storeAccessToken } from "@/api/client";
 import { useRouter } from "next/navigation";
-
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,16 +30,16 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginValidationType>({ resolver: zodResolver(loginValidation) });
 
-   const { start } = useLoginWithGoogle();
+  const { start } = useLoginWithGoogle();
 
- 
   const onSubmit = (data: LoginValidationType) => {
     LoginSubmit(
       { data },
       {
-        onSuccess: (data) => {
+        onSuccess: (response) => {
           toast.success("Login successful!");
-       
+          storeAccessToken(response.access_token || "");
+
           setTimeout(() => {
             router.push("/");
           }, 1000);

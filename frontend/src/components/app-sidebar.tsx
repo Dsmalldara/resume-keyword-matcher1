@@ -32,16 +32,16 @@ const items = [
     title: "Cover Letters",
     url: "/cover-letters",
     icon: PenLine,
-  }
+  },
 ];
 
 export function AppSidebar() {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="hidden md:flex">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
-            <h2>Resume KeyWord Matcher</h2>
+            <h2 className="text-sm md:text-base font-bold">Resume Matcher</h2>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -49,8 +49,8 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title} className="py-2">
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                      <item.icon className="w-4 h-4 md:w-5 md:h-5" />
+                      <span className="text-sm md:text-base">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

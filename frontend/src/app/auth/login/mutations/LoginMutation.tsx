@@ -1,3 +1,5 @@
+"use client";
+
 import { usePostAuthLogin } from "@/api/generated/authentication/authentication";
 
 export const useLoginMutation = () => {

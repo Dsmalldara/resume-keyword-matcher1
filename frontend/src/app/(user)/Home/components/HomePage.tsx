@@ -8,14 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Upload,
-  FileText,
-  TrendingUp,
-  Clock,
-  BarChart3,
-  Plus,
-} from "lucide-react";
+import { Upload, FileText, TrendingUp, Clock, BarChart3 } from "lucide-react";
 import ScoreCard from "./ScoreCard";
 import ResumeContentGrid from "../../resumes/components/ResumeContentGrid";
 import { stats } from "./mocks";
@@ -25,11 +18,12 @@ import { useRef, useState } from "react";
 import { useResumeCount } from "@/hooks/useResumeCount";
 import QuickActionSection from "./QuickActionSection";
 import QuickStats from "./QuickStats";
-import FileUploader from "./FileUploader";
+import { MatchScoreTrendChart } from "./MatchScoreTrendChart";
 import useGetAverageImprovementInsights, {
   useGetBestMatchScore,
   useGetJobAnalysisInsights,
 } from "../queries/insightsQuery";
+import FileUploader from "./FileUploader";
 
 export default function HomePage() {
   const resumeSectionRef = useRef<HTMLDivElement | null>(null);
@@ -139,17 +133,7 @@ export default function HomePage() {
             description="Your resume matching performance over time"
             icon={BarChart3}
           >
-            <div className="h-64 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-600 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <BarChart3 className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                <p className="text-slate-600 dark:text-slate-400">
-                  Interactive Chart Component
-                </p>
-                <p className="text-sm text-slate-500 mt-1">
-                  Line chart showing match scores over time
-                </p>
-              </div>
-            </div>
+            <MatchScoreTrendChart />
           </ResumeContentGrid>
 
           {/* Quick Actions */}

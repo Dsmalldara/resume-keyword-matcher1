@@ -1,54 +1,75 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog,DialogContent,DialogHeader,DialogTitle,} from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { FileText, TrendingUp } from "lucide-react";
 import { Resume } from "@/api/models/resume";
 import { useFetchResumes } from "../../Home/queries/resumeQuery";
 import SelectResume from "@/components/SelectResume";
-import { JobDescriptionDataType, jobDescriptionValidation } from "../validations/jobDescriptionValidation";
+import {
+  JobDescriptionDataType,
+  jobDescriptionValidation,
+} from "../validations/jobDescriptionValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useCreateAnalysisMutation } from "../mutations/createAnalysisMutation";
-import { JobDescriptionTextArea, JobInput } from "@/components/jobDescriptionUtils";
+import {
+  JobDescriptionTextArea,
+  JobInput,
+} from "@/components/jobDescriptionUtils";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/utils";
 import IsAnalyzingButton from "./IsAnalyzingButton";
 
 // Analysis Form Component
-const AnalysisForm = ({ isOpen, onOpenChange}: {isOpen: boolean; onOpenChange: (open: boolean) => void;}) => {
+const AnalysisForm = ({
+  isOpen,
+  onOpenChange,
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => {
   const [selectedResumeId, setSelectedResumeId] = useState("");
-    const {
-      register, handleSubmit,reset, formState: { errors }} = useForm<JobDescriptionDataType>({ resolver: zodResolver(jobDescriptionValidation) });
-     const {mutate:createAnalysis, isPending: isAnalyzing} = useCreateAnalysisMutation()
-      const onSubmit = (data: JobDescriptionDataType) => {
-        createAnalysis(
-          {
-            data: {
-              resumeId: selectedResumeId,
-              jobDescription: data.jobDescription,
-              jobTitle: data.jobTitle,
-              company: data.company,
-            }
-          },
-          {
-            onSuccess: (response) => {
-             toast.success("Analysis created successfully!");
-              onOpenChange(false);
-              reset(
-                {jobDescription: "", jobTitle: "", company: ""}
-              )
-            },
-            onError: (error) => {
-              toast.error(getErrorMessage(error));
-              onOpenChange(false);
-            },
-          },
-        );
-      };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<JobDescriptionDataType>({
+    resolver: zodResolver(jobDescriptionValidation),
+  });
+  const { mutate: createAnalysis, isPending: isAnalyzing } =
+    useCreateAnalysisMutation();
+  const onSubmit = (data: JobDescriptionDataType) => {
+    createAnalysis(
+      {
+        data: {
+          resumeId: selectedResumeId,
+          jobDescription: data.jobDescription,
+          jobTitle: data.jobTitle,
+          company: data.company,
+        },
+      },
+      {
+        onSuccess: (response) => {
+          toast.success("Analysis created successfully!");
+          onOpenChange(false);
+          reset({ jobDescription: "", jobTitle: "", company: "" });
+        },
+        onError: (error) => {
+          toast.error(getErrorMessage(error));
+          onOpenChange(false);
+        },
+      },
+    );
+  };
 
-  
-  const {data, isLoading } = useFetchResumes();
+  const { data, isLoading } = useFetchResumes();
   console.log("Fetched resumes data:", data);
   const resumes: Resume[] = data?.resumes || [];
   return (
@@ -70,7 +91,7 @@ const AnalysisForm = ({ isOpen, onOpenChange}: {isOpen: boolean; onOpenChange: (
           />
           <div className="space-y-2">
             <JobDescriptionTextArea
-              label="Job Description (optional)*"
+              label="Job Description*"
               {...register("jobDescription")}
               placeholder="Enter Job Description"
             />
@@ -105,11 +126,10 @@ const AnalysisForm = ({ isOpen, onOpenChange}: {isOpen: boolean; onOpenChange: (
             >
               Cancel
             </Button>
-             <IsAnalyzingButton
+            <IsAnalyzingButton
               isAnalyzing={isAnalyzing}
               selectedResumeId={selectedResumeId}
               disabled={isAnalyzing || !selectedResumeId}
-
             />
           </div>
         </form>

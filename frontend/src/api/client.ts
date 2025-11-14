@@ -7,16 +7,21 @@ const AXIOS_INSTANCE = axios.create({
 
 export const storeAccessToken = (newToken: string) => {
   if (typeof window !== "undefined") {
-    // Store in sessionStorage for client-side access
-    sessionStorage.setItem("access_token", newToken);
-    // Also store in a readable cookie for middleware access
-    document.cookie = `access_token=${newToken}; path=/; samesite=lax; secure`;
+    const token = getAccessToken();
+    if (!token) {
+      // Store in localStorage for client-side access
+      localStorage.setItem("access_token", newToken);
+      // Also store in a readable cookie for middleware access
+      const SEVEN_DAYS = 7 * 24 * 60 * 60; // 604800 seconds
+
+      document.cookie = `access_token=${newToken}; path=/; samesite=lax; secure; max-age=${SEVEN_DAYS}`;
+    }
   }
 };
 
 export const getAccessToken = () => {
   if (typeof window !== "undefined") {
-    return sessionStorage.getItem("access_token");
+    return localStorage.getItem("access_token");
   }
   return null;
 };
@@ -55,11 +60,9 @@ AXIOS_INSTANCE.interceptors.response.use(
         return AXIOS_INSTANCE(originalRequest);
       } catch (refreshError) {
         if (typeof window !== "undefined") {
-          sessionStorage.removeItem("access_token");
-          document.cookie =
-            "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-          document.cookie =
-            "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+          localStorage.removeItem("access_token");
+
+          document.cookie = `access_token=; path=/; samesite=lax; secure; max-age=0`;
 
           // Use window.location for client-side redirect
           window.location.href = "/auth/login";

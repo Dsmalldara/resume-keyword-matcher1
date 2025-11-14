@@ -1,13 +1,11 @@
 import { useFetchResumes } from "@/app/(user)/Home/queries/resumeQuery";
 
-
 export const useResumeCount = () => {
   const { data, isLoading, error } = useFetchResumes();
-  console.log("Resume data fetched:", data);
-  
+
   return {
     resumeCount: data?.resumes?.length || 0,
     isLoading,
-    isError: !!error
-  }
-}
+    isError: !!error,
+  };
+};
