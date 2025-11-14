@@ -25,6 +25,7 @@ export const getPostResumeUploadCompleteResponseMock = (
     faker.string.alpha({ length: { min: 10, max: 20 } }),
     undefined,
   ]),
+  exist: faker.datatype.boolean(),
   ...overrideResponse,
 });
 
