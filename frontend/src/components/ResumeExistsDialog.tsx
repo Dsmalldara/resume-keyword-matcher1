@@ -15,6 +15,7 @@ type ResumeExistsDialogProps = {
   onOpenChange: (open: boolean) => void;
   fileName?: string;
   onConfirm: () => void;
+  onCancel?: () => void;
 };
 
 export const ResumeExistsDialog = ({
@@ -22,6 +23,7 @@ export const ResumeExistsDialog = ({
   onOpenChange,
   fileName,
   onConfirm,
+  onCancel,
 }: ResumeExistsDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

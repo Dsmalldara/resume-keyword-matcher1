@@ -113,15 +113,25 @@ router.post(
       const existingResumeId = await prisma.resume.findFirst({
         where: {
           storageKey: storageKey,
-          fileUrl: filepath,
+          name: filename,
         },
         select: {
           id: true,
         },
       });
       // Create resume record
+      const existingResume = await prisma.resume.findFirst({
+        where: {
+          storageKey: storageKey,
+          name: filename,
+        },
+        select: { id: true },
+      });
+
       const resume = await prisma.resume.upsert({
-        where: { id: existingResumeId ? existingResumeId.id : resumeId },
+        where: {
+          id: existingResume?.id ?? resumeId, // Use existing ID if found, otherwise filepath ID
+        },
         create: {
           id: resumeId,
           storageKey,
@@ -133,9 +143,6 @@ router.post(
           isActive: true,
         },
         update: {
-          storageKey,
-          profileId,
-          name: filename,
           fileUrl: filepath,
           fileSize: size,
           version: { increment: 1 },

@@ -4,11 +4,13 @@ import { GetActivityByTypeTypeParams } from "@/api/models";
 import { queryKeys } from "@/lib/utils";
 export const useRecentActivity = (
   params: GetActivityByTypeTypeParams = {},
-  queryOptions: { enabled?: boolean; staleTime?: number; refetchInterval?: number } = {}
+  queryOptions: {
+    enabled?: boolean;
+    staleTime?: number;
+    refetchInterval?: number;
+  } = {},
 ) => {
-  const {
-    limit = 10,
-  } = params;
+  const { limit = 10 } = params;
 
   const {
     enabled = true,
@@ -17,7 +19,7 @@ export const useRecentActivity = (
   } = queryOptions;
 
   return useQuery({
-    queryKey: [queryKeys.activity,{limit}],
+    queryKey: [queryKeys.activity, { limit }],
     queryFn: () => getActivityRecent({ limit }),
     enabled,
     staleTime,
@@ -26,6 +28,5 @@ export const useRecentActivity = (
     retry: 2,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
   });
 };

@@ -112,13 +112,11 @@ router.post(
       });
 
       if (existingByPath || existingByName) {
-        return res
-          .status(200)
-          .json({
-            error:
-              "Resume already exists in database, may proceed under renaming",
-            exist: true,
-          });
+        return res.status(200).json({
+          message:
+            "Resume already exists in database, may proceed under renaming",
+          exist: true,
+        });
       }
 
       return res.status(200).json({

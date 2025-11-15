@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import { storeAccessToken } from "@/api/client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AuthHeader, AuthButton } from "../template/auth-template";
+import {
+  AuthContainer,
+  AuthSidebar,
+  AuthFormSection,
+  AuthBrandHeader,
+  ValuePropSection,
+  SidebarFooter,
+} from "../components/modern-auth-template";
 
 type AuthStatus = "loading" | "success" | "error";
 
@@ -54,149 +61,139 @@ export default function AuthSignUpCallback() {
   }, [router, searchParams]);
 
   return (
-    <AuthHeader>
-      {/* Header */}
-      <div className="p-12 border-b-4 border-black text-center">
-        <div className="text-5xl mb-4">
-          {status === "loading" && "⏳"}
-          {status === "success" && "✅"}
-          {status === "error" && "❌"}
-        </div>
-        <h1
-          className="text-4xl font-black tracking-tight"
-          style={{ fontFamily: "Arial Black, sans-serif" }}
-        >
-          {status === "loading" && "VERIFYING..."}
-          {status === "success" && "SUCCESS!"}
-          {status === "error" && "OOPS!"}
-        </h1>
-      </div>
+    <AuthContainer>
+      <AuthSidebar>
+        <AuthBrandHeader title="Resume Keys" />
+        <ValuePropSection
+          items={[
+            {
+              title: "Smart Analysis",
+              description:
+                "Upload multiple resumes and get instant AI-powered insights on your qualifications.",
+            },
+            {
+              title: "Job Fit Intelligence",
+              description:
+                "Extract job requirements and receive personalized recommendations for positions that match your profile.",
+            },
+            {
+              title: "Career Growth",
+              description:
+                "Identify skill gaps and get actionable insights to improve your candidacy.",
+            },
+          ]}
+        />
+        <SidebarFooter>
+          Join hundreds of professionals using Resume Keys to land their dream
+          roles.
+        </SidebarFooter>
+      </AuthSidebar>
 
-      {/* Content */}
-      <div className="p-10">
-        {/* Loading State */}
-        {status === "loading" && (
-          <>
-            <p className="text-lg leading-relaxed mb-8 text-gray-900 text-center">
-              {message}
-            </p>
-
-            {/* Brutal spinner */}
-            <div className="flex justify-center mb-8">
-              <div
-                className="w-16 h-16 border-4 border-black animate-spin"
-                style={{
-                  borderTopColor: "transparent",
-                  borderRadius: "0",
-                }}
-              />
-            </div>
-
-            {/* Progress bar */}
-            <div className="border-4 border-black bg-gray-200 h-8 relative overflow-hidden">
-              <div
-                className="bg-yellow-400 h-full border-r-4 border-black animate-pulse"
-                style={{ width: "75%" }}
-              />
-              <div
-                className="absolute inset-0 flex items-center justify-center font-bold text-sm"
-                style={{ fontFamily: "Courier New, monospace" }}
-              >
-                AUTHENTICATING...
+      <AuthFormSection>
+        <div className="w-full max-w-md">
+          {/* Loading State */}
+          {status === "loading" && (
+            <div className="text-center space-y-8">
+              <div className="flex justify-center">
+                <div className="animate-spin">
+                  <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-black mb-2 bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+                  Verifying...
+                </h2>
+                <p className="text-slate-600 font-medium">{message}</p>
+              </div>
+              <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+                <p className="text-sm text-slate-700 font-medium">
+                  Please wait while we verify your credentials
+                </p>
               </div>
             </div>
-          </>
-        )}
+          )}
 
-        {/* Success State */}
-        {status === "success" && (
-          <>
-            <div
-              className="border-4 border-green-600 bg-green-50 p-6 mb-6"
-              style={{ boxShadow: "6px 6px 0px #16A34A" }}
-            >
-              <p
-                className="text-lg font-bold text-green-900 text-center"
-                style={{ fontFamily: "Courier New, monospace" }}
-              >
-                {message}
-              </p>
-            </div>
-
-            <div className="border-3 border-black bg-gray-100 p-6 text-center">
-              <div
-                className="text-xs text-gray-600 uppercase tracking-widest mb-2"
-                style={{ fontFamily: "Courier New, monospace" }}
-              >
-                ⚡ Status
-              </div>
-              <div
-                className="text-3xl font-black text-black mb-1"
-                style={{ fontFamily: "Arial Black, sans-serif" }}
-              >
-                AUTHENTICATED
-              </div>
-              <div className="text-sm text-gray-600 flex items-center justify-center gap-2 mt-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                Redirecting to dashboard...
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Error State */}
-        {status === "error" && (
-          <>
-            <div
-              className="border-4 border-red-600 bg-red-50 p-6 mb-6"
-              style={{ boxShadow: "6px 6px 0px #DC2626" }}
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl">⚠️</span>
-                <div>
-                  <div
-                    className="font-black uppercase text-sm mb-2 text-red-900"
-                    style={{ fontFamily: "Arial Black, sans-serif" }}
+          {/* Success State */}
+          {status === "success" && (
+            <div className="text-center space-y-8">
+              <div className="flex justify-center">
+                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    AUTHENTICATION FAILED
-                  </div>
-                  <p
-                    className="text-sm text-red-800"
-                    style={{ fontFamily: "Courier New, monospace" }}
-                  >
-                    {message}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-4xl lg:text-5xl font-black mb-3 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  Welcome!
+                </h2>
+                <p className="text-slate-600 font-medium text-lg">{message}</p>
+              </div>
+              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></span>
+                  <p className="text-sm text-slate-700 font-medium">
+                    Redirecting to dashboard...
                   </p>
                 </div>
               </div>
             </div>
+          )}
 
-            <AuthButton
-              text="RETURN TO LOGIN →"
-              onClick={() => router.push("/auth/login")}
-            />
-
-            <p
-              className="mt-6 text-center text-sm text-gray-600"
-              style={{ fontFamily: "Courier New, monospace" }}
-            >
-              Auto-redirecting in 3 seconds...
-            </p>
-          </>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="p-8 bg-gray-50 border-t-4 border-black">
-        <p
-          className="text-sm text-gray-600 text-center m-0"
-          style={{ fontFamily: "Courier New, monospace" }}
-        >
-          {status === "loading" &&
-            "Please wait while we verify your credentials"}
-          {status === "success" && "Welcome back! Your session is now active"}
-          {status === "error" && "Need help? Contact support@resumematcher.com"}
-        </p>
-      </div>
-    </AuthHeader>
+          {/* Error State */}
+          {status === "error" && (
+            <div className="text-center space-y-8">
+              <div className="flex justify-center">
+                <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-4xl lg:text-5xl font-black mb-3 bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+                  Oops!
+                </h2>
+                <p className="text-slate-600 font-medium">{message}</p>
+              </div>
+              <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4">
+                <p className="text-sm text-slate-700 font-medium mb-4">
+                  Authentication failed
+                </p>
+                <button
+                  onClick={() => router.push("/auth/login")}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold rounded-lg hover:from-indigo-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl uppercase tracking-wide text-sm"
+                >
+                  Return to Login
+                </button>
+              </div>
+              <p className="text-sm text-slate-600 font-medium">
+                Auto-redirecting in 3 seconds...
+              </p>
+            </div>
+          )}
+        </div>
+      </AuthFormSection>
+    </AuthContainer>
   );
 }

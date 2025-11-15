@@ -7,15 +7,10 @@ const AXIOS_INSTANCE = axios.create({
 
 export const storeAccessToken = (newToken: string) => {
   if (typeof window !== "undefined") {
-    const token = getAccessToken();
-    if (!token) {
-      // Store in localStorage for client-side access
-      localStorage.setItem("access_token", newToken);
-      // Also store in a readable cookie for middleware access
-      const SEVEN_DAYS = 7 * 24 * 60 * 60; // 604800 seconds
+    localStorage.setItem("access_token", newToken);
 
-      document.cookie = `access_token=${newToken}; path=/; samesite=lax; secure; max-age=${SEVEN_DAYS}`;
-    }
+    const SEVEN_DAYS = 7 * 24 * 60 * 60;
+    document.cookie = `access_token=${newToken}; path=/; samesite=lax; secure; max-age=${SEVEN_DAYS}`;
   }
 };
 

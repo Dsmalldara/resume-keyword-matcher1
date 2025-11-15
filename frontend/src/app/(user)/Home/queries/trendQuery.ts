@@ -18,6 +18,8 @@ export const useGetTrendQuery = (limit: number = 30) => {
         method: "GET",
       });
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 };
 

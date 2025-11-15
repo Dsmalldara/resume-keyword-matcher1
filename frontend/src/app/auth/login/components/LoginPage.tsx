@@ -1,13 +1,4 @@
 "use client";
-import {
-  AuthButton,
-  AuthContinueWithGoogle,
-  AuthDividerLine,
-  AuthHeader,
-  AuthHeaderText,
-  AuthInput,
-  AuthRevertButton,
-} from "../../template/auth-template";
 import Link from "next/link";
 import { useLoginMutation } from "../mutations/LoginMutation";
 import { useLoginWithGoogle } from "../queries/useLoginWithGoogle";
@@ -18,17 +9,38 @@ import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/utils";
 import { storeAccessToken } from "@/api/client";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import {
+  AuthContainer,
+  AuthSidebar,
+  AuthFormSection,
+  AuthMobileHeader,
+  AuthFormContainer,
+  AuthBrandHeader,
+  AuthPageHeader,
+  ValuePropSection,
+  SidebarFooter,
+  AuthInput,
+  PasswordInput,
+  AuthDivider,
+  GoogleAuthButton,
+  AuthSubmitButton,
+  AuthNavLink,
+} from "../../components/modern-auth-template";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { mutate: LoginSubmit, isPending, isError } = useLoginMutation();
+  const [showPassword, setShowPassword] = useState(false);
+  const { mutate: LoginSubmit, isPending } = useLoginMutation();
 
   const {
     register,
     handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<LoginValidationType>({ resolver: zodResolver(loginValidation) });
+    formState: { errors, isValid },
+  } = useForm<LoginValidationType>({
+    resolver: zodResolver(loginValidation),
+    mode: "onChange",
+  });
 
   const { start } = useLoginWithGoogle();
 
@@ -37,12 +49,9 @@ export default function LoginPage() {
       { data },
       {
         onSuccess: (response) => {
-          toast.success("Login successful!");
+          toast.success("Signed in successfully");
           storeAccessToken(response.access_token || "");
-
-          setTimeout(() => {
-            router.push("/");
-          }, 1000);
+          setTimeout(() => router.push("/"), 1000);
         },
         onError: (error) => {
           toast.error(getErrorMessage(error));
@@ -52,62 +61,88 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthHeader>
-      <AuthHeaderText headerText="WELCOME BACK" />
-      <div className="p-10">
-        <p className="text-lg leading-relaxed mb-8 text-gray-900">
-          Log in to continue your job search journey.
-        </p>
+    <AuthContainer>
+      <AuthSidebar>
+        <ValuePropSection
+          items={[
+            {
+              title: "Smart Analysis",
+              description:
+                "Upload multiple resumes and get instant AI-powered insights on your qualifications.",
+            },
+            {
+              title: "Job Fit Intelligence",
+              description:
+                "Extract job requirements and receive personalized recommendations for positions that match your profile.",
+            },
+            {
+              title: "Cover Letter Assistance",
+              description:
+                "Get help crafting personalized cover letters that highlight your strengths, using insights from various resumes uploaded and job descriptions analyzed.",
+            },
+          ]}
+        />
+        <SidebarFooter>
+          Join hundreds of professionals using Resume Keys to land their dream
+          roles.
+        </SidebarFooter>
+      </AuthSidebar>
 
-        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <AuthInput
-            label="Email Address"
-            type="email"
-            {...register("email")}
-            error={errors.email?.message}
-            className="w-full px-4 py-3 border-4 border-black text-lg focus:outline-none focus:ring-0"
-            style={{ boxShadow: "4px 4px 0px #000000" }}
-            placeholder="you@example.com"
+      <AuthFormSection>
+        <AuthFormContainer>
+          <AuthPageHeader
+            title="Welcome back"
+            subtitle="Continue to your resume analysis dashboard"
           />
 
-          <div>
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <AuthInput
-              label="Password"
-              type="password"
-              {...register("password")}
-              error={errors.password?.message}
-              className="w-full px-4 py-3 border-4 border-black text-lg focus:outline-none focus:ring-0"
-              style={{ boxShadow: "4px 4px 0px #000000" }}
-              placeholder="Enter your password"
+              label="Email address"
+              type="email"
+              placeholder="name@example.com"
+              autoComplete="email"
+              error={errors.email?.message}
+              {...register("email")}
             />
-            <AuthRevertButton>
-              <Link href="/auth/forget-password">Forgot Password?</Link>
-            </AuthRevertButton>
-          </div>
 
-          <AuthButton
-            text="LOG IN →"
-            type="submit"
-            disabled={isPending}
-            isLoading={isPending}
+            <PasswordInput
+              label="Password"
+              placeholder="Enter your password"
+              autoComplete="current-password"
+              error={errors.password?.message}
+              showPassword={showPassword}
+              onTogglePassword={() => setShowPassword(!showPassword)}
+              {...register("password")}
+            />
+
+            <div className="flex justify-end">
+              <Link
+                href="/auth/forget-password"
+                className="text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <AuthSubmitButton
+              text="Sign in"
+              isLoading={isPending}
+              disabled={!isValid}
+            />
+          </form>
+
+          <AuthDivider />
+
+          <GoogleAuthButton onClick={start} />
+
+          <AuthNavLink
+            text="Don't have an account?"
+            linkText="Create one"
+            href="/auth/signup"
+            LinkComponent={Link}
           />
-
-          <AuthDividerLine />
-        </form>
-        <AuthContinueWithGoogle onClick={start} />
-      </div>
-
-      <div className="p-8 bg-gray-50 border-t-4 border-black">
-        <p
-          className="text-sm text-gray-600 m-0"
-          style={{ fontFamily: "Courier New, monospace" }}
-        >
-          Don't have an account?{" "}
-          <span className="font-bold text-black underline cursor-pointer">
-            <Link href="/auth/signup">Sign up here</Link>
-          </span>
-        </p>
-      </div>
-    </AuthHeader>
+        </AuthFormContainer>
+      </AuthFormSection>
+    </AuthContainer>
   );
 }

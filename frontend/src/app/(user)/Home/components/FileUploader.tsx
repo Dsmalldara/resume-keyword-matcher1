@@ -25,18 +25,72 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [finalUrl, setFinalUrl] = useState<string | null>(null);
   const [resumeExists, setResumeExists] = useState<boolean>(false);
-  const [showResumeExistsDialog, setShowResumeExistsDialog] =
-    useState<boolean>(false);
   const [uploadState, setUploadState] = useState<
     "idle" | "getting-url" | "ready" | "uploading" | "success" | "error"
   >("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [resumeDataForReplace, setResumeDataForReplace] = useState<
+    object | null
+  >(null);
   const { mutate: getPreSignedUrl } = useGetPreSignedUrlMutation();
   const { mutate: uploadComplete } = useUploadCompleteMutation();
   const { mutate: uploadFinalize } = useUploadFinalizeMutation();
   const access_token = getAccessToken();
 
+  const uploadToStorage = async (data: any) => {
+    setUploadState("uploading");
+    setUploadProgress(0);
+
+    // STEP 2: Upload to Supabase ONLY if validation succeeded
+    try {
+      if (!signedUrl) {
+        setUploadState("error");
+        toast.error("Upload URL not available.");
+        return;
+      }
+
+      const interval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(interval);
+            return prev;
+          }
+          return prev + 10;
+        });
+      }, 100);
+
+      const response = await fetch(signedUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-Type": file?.type || "application/octet-stream",
+        },
+      });
+      clearInterval(interval);
+
+      if (response.ok) {
+        setUploadProgress(100);
+        setUploadState("success");
+        toast.success("Resume uploaded successfully!");
+        if (file && selectedFile) {
+          uploadFinalize({
+            data: {
+              filename: file.name,
+              filepath: finalUrl || "",
+              size: selectedFile.size,
+            },
+          });
+        }
+      } else {
+        setUploadState("error");
+        toast.error(`Upload failed: ${response.statusText}`);
+      }
+    } catch (uploadError) {
+      setUploadState("error");
+      toast.error("Upload to storage failed.");
+    }
+  };
   // Validate file
   const validateFile = (file: File): boolean => {
     const allowedTypes = [
@@ -89,8 +143,8 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
       },
       {
         onSuccess: (data) => {
-          setSignedUrl(data.uploadUrl || null); // Adjust based on your API response
-          setFinalUrl(data.filepath || null); // Adjust based on your API response
+          setSignedUrl(data.uploadUrl || null);
+          setFinalUrl(data.filepath || null);
           setUploadState("ready");
 
           toast.success("File ready to upload!");
@@ -108,8 +162,6 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
     if (!file || !signedUrl || !selectedFile) {
       return;
     }
-    setUploadState("uploading");
-    setUploadProgress(0);
 
     try {
       // STEP 1: Validate with backend first
@@ -123,49 +175,16 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
         },
         {
           onSuccess: async (data) => {
-            setUploadProgress(30);
-
-            // STEP 2: Upload to Supabase ONLY if validation succeeded
-            try {
-              const interval = setInterval(() => {
-                setUploadProgress((prev) => {
-                  if (prev >= 90) {
-                    clearInterval(interval);
-                    return prev;
-                  }
-                  return prev + 10;
-                });
-              }, 100);
-
-              const response = await fetch(signedUrl, {
-                method: "PUT",
-                body: file,
-                headers: {
-                  "Content-Type": file.type,
-                },
+            if (data.exist) {
+              setResumeDataForReplace({
+                filename: file.name,
+                filepath: finalUrl || "",
+                size: selectedFile.size,
               });
-              clearInterval(interval);
-
-              if (response.ok) {
-                setUploadProgress(100);
-                setUploadState("success");
-                toast.success("Resume uploaded successfully!");
-                uploadFinalize({
-                  data: {
-                    filename: file.name,
-                    filepath: finalUrl || "",
-                    size: selectedFile.size,
-                  },
-                });
-              } else {
-                const errorText = await response.text();
-                setUploadState("error");
-                toast.error(`Upload failed: ${response.statusText}`);
-              }
-            } catch (uploadError) {
-              setUploadState("error");
-              toast.error("Upload to storage failed.");
+              setResumeExists(true);
+              return;
             }
+            uploadToStorage(data);
           },
           onError: (error) => {
             getErrorMessage(error);
@@ -209,7 +228,7 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
   });
 
   const fileSizeInMb = file ? (file.size / (1024 * 1024)).toFixed(2) : null;
-
+  console.log(resumeExists);
   return (
     <div ref={ref}>
       <ResumeExistsDialog
@@ -218,7 +237,7 @@ const FileUploader = forwardRef<HTMLDivElement>((props, ref) => {
         fileName={file?.name || ""}
         onConfirm={() => {
           setResumeExists(false);
-          handleUploadToSupabase();
+          uploadToStorage(resumeDataForReplace);
         }}
       />
       {uploadState === "success" && (
