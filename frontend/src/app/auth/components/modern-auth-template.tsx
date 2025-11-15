@@ -88,7 +88,7 @@ export const AuthPageHeader = ({
       rel="stylesheet"
     />
     <h2
-      className="text-4xl font-bold"
+      className="text-4xl font-bold my-6"
       style={{
         fontFamily: "'Plus Jakarta Sans', sans-serif",
         letterSpacing: "-0.025em",
@@ -105,8 +105,10 @@ export const AuthPageHeader = ({
 
 export const ValuePropSection = ({
   items,
+  icon,
 }: {
   items: Array<{ title: string; description: string }>;
+  icon?: React.ComponentType<any>[];
 }) => {
   const icons = [Brain, Target, FileText];
 

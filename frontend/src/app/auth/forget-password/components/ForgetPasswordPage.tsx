@@ -1,13 +1,20 @@
 "use client";
 import { useState } from "react";
 import {
-  AuthButton,
-  AuthHeader,
-  AuthHeaderText,
+  AuthContainer,
+  AuthSidebar,
+  AuthFormSection,
+  AuthFormContainer,
+  AuthBrandHeader,
+  AuthPageHeader,
+  ValuePropSection,
+  SidebarFooter,
   AuthInput,
-  AuthRevertButton,
-} from "../../template/auth-template";
-import { Link } from "lucide-react";
+  AuthSubmitButton,
+  AuthNavLink,
+} from "../../components/modern-auth-template";
+import { Mail, Shield, Clock, ArrowRight, CheckCircle } from "lucide-react";
+import Link from "next/link";
 import { forgetPasswordValidation } from "./forgetpassword-validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -48,109 +55,157 @@ export default function ForgotPassword() {
 
   if (isSubmitted) {
     return (
-      <AuthHeader>
-        <AuthHeaderText headerText="CHECK YOUR EMAIL" />
-
-        <div className="p-10">
-          <p className="text-lg leading-relaxed mb-6 text-gray-900">
-            If an account exists for <strong>{emailValue}</strong>, you'll
-            receive password reset instructions shortly.
-          </p>
-
-          <div className="border-3 border-black bg-gray-100 p-6 text-center my-8">
-            <div
-              className="text-xs text-gray-600 uppercase tracking-widest mb-2"
-              style={{ fontFamily: "Courier New, monospace" }}
-            >
-              ⏱️ Link Valid For
-            </div>
-            <div
-              className="text-3xl font-black text-black mb-1"
-              style={{ fontFamily: "Arial Black, sans-serif" }}
-            >
-              1 HOUR
-            </div>
-            <div className="text-sm text-gray-600">
-              After that, request a new one
-            </div>
+      <AuthContainer>
+        {/* Desktop Sidebar */}
+        <AuthSidebar>
+          <div>
+            <AuthBrandHeader title="Secure Reset" />
+            <ValuePropSection
+              items={[
+                {
+                  title: "Email Sent",
+                  description: "Check your inbox for reset instructions",
+                },
+                {
+                  title: "Time-Limited",
+                  description: "Link valid for 1 hour for security",
+                },
+                {
+                  title: "Protected",
+                  description: "Your account remains secure",
+                },
+              ]}
+            />
           </div>
+          <SidebarFooter>
+            Your privacy is our priority. All emails are encrypted and secure.
+          </SidebarFooter>
+        </AuthSidebar>
 
-          <div className="bg-black text-white p-5 border-3 border-black mb-6">
-            <p
-              className="text-sm leading-relaxed m-0"
-              style={{ fontFamily: "Courier New, monospace" }}
-            >
-              <strong>PRO TIP:</strong> Check your spam folder. Sometimes our
-              emails like to play hide and seek.
-            </p>
-          </div>
+        {/* Main Form Section */}
+        <AuthFormSection>
+          <AuthFormContainer>
+            <div className="text-center space-y-8">
+              <div className="flex justify-center">
+                <CheckCircle className="w-16 h-16 text-green-600 animate-bounce" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-slate-900 mb-2">
+                  Check Your Email
+                </h2>
+                <p className="text-slate-600">
+                  If an account exists for <strong>{emailValue}</strong>, you'll
+                  receive password reset instructions shortly.
+                </p>
+              </div>
 
-          <AuthRevertButton>
-            <Link href="/auth/login">← Back to Login</Link>
-          </AuthRevertButton>
-        </div>
-      </AuthHeader>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-blue-900">
+                      Link Valid For 1 Hour
+                    </p>
+                    <p className="text-xs text-blue-700">
+                      After that, request a new one
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p className="text-sm text-amber-900">
+                  💡 <strong>Pro Tip:</strong> Check your spam folder if you
+                  don't see the email within a few minutes.
+                </p>
+              </div>
+
+              <AuthNavLink
+                text="Ready to log in?"
+                linkText="Back to Login"
+                href="/auth/login"
+                LinkComponent={Link}
+              />
+            </div>
+          </AuthFormContainer>
+        </AuthFormSection>
+      </AuthContainer>
     );
   }
 
   return (
-    <AuthHeader>
-      <AuthHeaderText headerText="FORGOT YOUR PASSWORD?" />
-
-      <div className="p-10">
-        <p className="text-lg leading-relaxed mb-8 text-gray-900">
-          No worries. Enter your email and we'll send you reset instructions.
-        </p>
-
-        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <AuthInput
-            label="Email Address"
-            type="email"
-            {...register("email")}
-            className="w-full px-4 py-3 border-4 border-black text-lg focus:outline-none focus:ring-0"
-            style={{ boxShadow: "4px 4px 00px #000000" }}
-            placeholder="you@example.com"
-            error={errors.email?.message}
+    <AuthContainer>
+      {/* Desktop Sidebar */}
+      <AuthSidebar>
+        <div>
+          <AuthBrandHeader title="Password Help" />
+          <ValuePropSection
+            items={[
+              {
+                title: "Quick Reset",
+                description: "Instant reset link to your email",
+              },
+              {
+                title: "Secure",
+                description: "Military-grade encryption for your safety",
+              },
+              {
+                title: "Fast",
+                description: "Receive instructions in seconds",
+              },
+            ]}
           />
-
-          {/* submit button */}
-          <AuthButton
-            text=" SEND RESET LINK →"
-            type="submit"
-            isLoading={isPending}
-          />
-
-          <AuthRevertButton>
-            <Link href="/auth/login">← Back to Login</Link>
-          </AuthRevertButton>
-        </form>
-
-        <div className="mt-8 border-3 border-black bg-gray-100 p-6">
-          <div
-            className="text-xs text-gray-600 uppercase tracking-widest mb-3"
-            style={{ fontFamily: "Courier New, monospace" }}
-          >
-            🛡️ Security Note
-          </div>
-          <p className="text-sm text-gray-700 leading-relaxed m-0">
-            For security reasons, we'll send the reset link even if the email
-            doesn't exist in our system. This prevents bad actors from
-            discovering valid accounts.
-          </p>
         </div>
-      </div>
+        <SidebarFooter>
+          Your privacy is our priority. All emails are encrypted and secure.
+        </SidebarFooter>
+      </AuthSidebar>
 
-      <div className="p-8 bg-gray-50 border-t-4 border-black">
-        <p
-          className="text-sm text-gray-600 m-0"
-          style={{ fontFamily: "Courier New, monospace" }}
-        >
-          Remember your password?{" "}
-          <span className="font-bold text-black underline cursor-pointer">
-            Log in here
-          </span>
-        </p>
-      </div>
-    </AuthHeader>
+      {/* Main Form Section */}
+      <AuthFormSection>
+        <AuthFormContainer>
+          <div className="space-y-8">
+            <AuthPageHeader
+              title="Forgot Your Password?"
+              subtitle="No worries. Enter your email and we'll send you reset instructions."
+            />
+
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              <AuthInput
+                label="Email Address"
+                type="email"
+                {...register("email")}
+                placeholder="you@example.com"
+                error={errors.email?.message}
+              />
+
+              <AuthSubmitButton
+                text={isPending ? "Sending..." : "Send Reset Link"}
+                isLoading={isPending}
+                disabled={isPending}
+                type="submit"
+              />
+            </form>
+
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+              <p className="text-sm text-slate-700 leading-relaxed">
+                <strong>Security Note:</strong> For your protection, we send
+                reset links even if the email doesn't exist in our system. This
+                prevents bad actors from discovering valid accounts.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <AuthNavLink
+                text="Remember your password?"
+                linkText="Log in here"
+                href="/auth/login"
+                LinkComponent={Link}
+              />
+            </div>
+          </div>
+        </AuthFormContainer>
+      </AuthFormSection>
+    </AuthContainer>
   );
 }
