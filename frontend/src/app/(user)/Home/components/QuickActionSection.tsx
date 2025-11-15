@@ -73,7 +73,7 @@ function QuickActionSection({ children }: QuickActionSectionProps) {
       },
       {
         onSuccess: () => {
-          toast.success("Analysis started! Processing your resume...");
+          toast.success("Analysis created successfully!");
           setShowAnalysisDialog(false);
           setSelectedResumeId("");
           updateJobData({ jobDescription: "", jobTitle: "", company: "" });
