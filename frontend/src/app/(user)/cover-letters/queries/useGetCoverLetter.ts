@@ -16,7 +16,7 @@ export const useGetIndividualLetter = (coverLetterId?: string) => {
     queryFn: () => {
       return getCoverlettersLettersSingleId(coverLetterId || "");
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - matches global config
     refetchOnWindowFocus: false,
   });
 };
@@ -25,7 +25,7 @@ export const useGetCoverLetters = (params?: GetCoverlettersLettersParams) => {
   return useQuery({
     queryKey: [queryKeys.coverletters, params],
     queryFn: () => getCoverlettersLetters(params),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - matches global config
     refetchOnWindowFocus: false,
   });
 };

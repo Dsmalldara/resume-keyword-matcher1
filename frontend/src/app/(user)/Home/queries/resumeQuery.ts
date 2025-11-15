@@ -1,15 +1,45 @@
 import { queryKeys } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { getResumeListGetResume } from "@/api/generated/resume/resume";
+import { useGetResumeListGetResume } from "@/api/generated/resume/resume";
 import { GetResumeListGetResumeParams } from "@/api/models";
-export const useFetchResumes = (params?: GetResumeListGetResumeParams) => {
-  return useQuery({
-    queryKey: [queryKeys.resume, params],
-    queryFn: () => getResumeListGetResume(params),
-    enabled: true,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
-    refetchOnWindowFocus: false,
+
+/**
+ * Fetches all resumes without pagination
+ * Used for dropdowns and selections across the app
+ * Cache is shared and persisted indefinitely
+ */
+export const useFetchResumes = () => {
+  const query = useGetResumeListGetResume(undefined, {
+    query: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      retry: 1,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    },
   });
+
+  return query;
+};
+
+/**
+ * Fetches resumes with pagination
+ * Each page creates a separate cache entry
+ * Use this ONLY in ResumePage for pagination
+ */
+export const useFetchResumesPaginated = (
+  params?: GetResumeListGetResumeParams,
+) => {
+  const query = useGetResumeListGetResume(params, {
+    query: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 5 * 60 * 1000, // Shorter GC for paginated queries - it's page-specific
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      retry: 1,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    },
+  });
+
+  return query;
 };

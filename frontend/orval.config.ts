@@ -9,7 +9,7 @@ export default defineConfig({
       mode: "tags-split",
       target: "src/api/generated",
       schemas: "src/api/models",
-      client: "react-query", // or 'axios', 'fetch', 'swr'
+      client: "react-query",
       mock: true,
       prettier: true,
       override: {

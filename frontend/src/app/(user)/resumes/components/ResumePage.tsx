@@ -7,7 +7,7 @@ import ResumeTable from "./ResumeTable";
 import MobileResumeCards from "./MobileResumeCards";
 import UploadResumeCard from "./UploadResumeCard";
 import FileUploader from "../../Home/components/FileUploader";
-import { useFetchResumes } from "../../Home/queries/resumeQuery";
+import { useFetchResumesPaginated } from "../../Home/queries/resumeQuery";
 import { GetResumeListGetResumeParams, Resume } from "@/api/models";
 import { useState } from "react";
 import Pagination from "@/components/ui/pagination";
@@ -18,7 +18,7 @@ export default function ResumePage() {
       perPage: 10,
     });
 
-  const { data, isLoading } = useFetchResumes(paginationState);
+  const { data, isLoading } = useFetchResumesPaginated(paginationState);
   const resumes: Resume[] = data?.resumes || [];
   const totalPages = data?.pagination?.totalPages ?? 1;
   return (

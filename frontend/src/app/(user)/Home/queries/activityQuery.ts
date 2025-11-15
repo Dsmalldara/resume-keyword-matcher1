@@ -14,7 +14,7 @@ export const useRecentActivity = (
 
   const {
     enabled = true,
-    staleTime = 2 * 60 * 1000, // 2 minutes for activity feed
+    staleTime = 5 * 60 * 1000, // 5 minutes - matches global config
     refetchInterval,
   } = queryOptions;
 
@@ -24,9 +24,9 @@ export const useRecentActivity = (
     enabled,
     staleTime,
     refetchInterval,
-    gcTime: 10 * 60 * 1000, // Cache for 10 minutes (renamed from cacheTime in v5)
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+    gcTime: 10 * 60 * 1000, // Cache for 10 minutes
+    retry: 1, // Use global retry config
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     refetchOnWindowFocus: false,
   });
 };

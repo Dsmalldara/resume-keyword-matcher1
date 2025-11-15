@@ -9,11 +9,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh for longer
-            gcTime: 10 * 60 * 1000, // 10 minutes - cache persists longer in memory
+            staleTime: 10 * 60 * 1000, // 10 minutes - data stays fresh
+            gcTime: 30 * 60 * 1000, // 30 minutes - cache persists in memory much longer
             refetchOnWindowFocus: false, // Don't refetch when window regains focus
-            refetchOnReconnect: "always", // Refetch when reconnecting to network
-            retry: 1, // Retry failed requests once
+            refetchOnReconnect: false, // Don't refetch on reconnect
+            retry: 1,
             retryDelay: (attemptIndex) =>
               Math.min(1000 * 2 ** attemptIndex, 30000),
           },

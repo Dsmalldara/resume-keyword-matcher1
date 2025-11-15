@@ -12,7 +12,6 @@ export const useGetTrendQuery = (limit: number = 30) => {
   return useQuery({
     queryKey: ["analysis", "trend", limit],
     queryFn: async (): Promise<TrendRecord[]> => {
-      console.log("Fetching trend data with limit:", limit);
       return customInstance({
         url: `/analysis/trend?limit=${limit}`,
         method: "GET",
