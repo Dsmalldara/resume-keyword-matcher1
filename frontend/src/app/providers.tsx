@@ -23,7 +23,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         },
       }),
   );
-
+  console.log("QueryClient created:", queryClient); // Logs once on app mount
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );

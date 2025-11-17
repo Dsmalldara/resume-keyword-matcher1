@@ -18,6 +18,7 @@ export const useGetTrendQuery = (limit: number = 30) => {
       });
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes - persist cache when navigating away
     refetchOnWindowFocus: false,
   });
 };

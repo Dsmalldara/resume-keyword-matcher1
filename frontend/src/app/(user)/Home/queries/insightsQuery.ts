@@ -10,6 +10,7 @@ export const useGetAverageImprovementInsights = () => {
     queryFn: () => getInsightsImprovementInsights(),
     enabled: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes - persist cache when navigating away
   });
 };
 
@@ -21,6 +22,7 @@ export const useGetBestMatchScore = () => {
     queryFn: () => getInsightsBestMatch(),
     enabled: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes - persist cache when navigating away
   });
 };
 
@@ -30,5 +32,6 @@ export const useGetJobAnalysisInsights = () => {
     queryFn: () => getInsightsJobsAnalyzed(),
     enabled: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes - persist cache when navigating away
   });
 };

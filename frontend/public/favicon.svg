@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="32" fill="#3b82f6"/>
+  
+  <!-- Resume/Document icon -->
+  <g>
+    <!-- Document -->
+    <rect x="16" y="12" width="20" height="28" rx="1.5" fill="white" stroke="white" stroke-width="0.5"/>
+    
+    <!-- Document lines (resume content) -->
+    <line x1="20" y1="18" x2="32" y2="18" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="20" y1="23" x2="32" y2="23" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="20" y1="28" x2="28" y2="28" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Matching arrows/indicator -->
+  <g>
+    <!-- Left curved arrow pointing right -->
+    <path d="M 12 34 Q 15 38 20 38" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="22,38 20,35 20,41" fill="white"/>
+    
+    <!-- Right curved arrow pointing left -->
+    <path d="M 52 34 Q 49 38 44 38" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="42,38 44,35 44,41" fill="white"/>
+  </g>
+  
+  <!-- Check mark in center -->
+  <circle cx="32" cy="44" r="6" fill="#10b981" opacity="0.9"/>
+  <path d="M 30 44 L 31.5 45.5 L 34 43" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
