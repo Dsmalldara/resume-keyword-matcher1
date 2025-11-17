@@ -8,9 +8,6 @@ export const useGetAverageImprovementInsights = () => {
   return useQuery({
     queryKey: [queryKeys.insights, queryKeys.analysis[1]],
     queryFn: () => getInsightsImprovementInsights(),
-    enabled: true,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes - persist cache when navigating away
   });
 };
 
@@ -20,9 +17,6 @@ export const useGetBestMatchScore = () => {
   return useQuery({
     queryKey: [queryKeys.insights, queryKeys.analysis[0]],
     queryFn: () => getInsightsBestMatch(),
-    enabled: true,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes - persist cache when navigating away
   });
 };
 
@@ -30,8 +24,5 @@ export const useGetJobAnalysisInsights = () => {
   return useQuery({
     queryKey: [queryKeys.insights, queryKeys.analysis[2]],
     queryFn: () => getInsightsJobsAnalyzed(),
-    enabled: true,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes - persist cache when navigating away
   });
 };

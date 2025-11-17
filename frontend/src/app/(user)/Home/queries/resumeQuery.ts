@@ -33,11 +33,9 @@ export const useFetchResumesPaginated = (
   const query = useGetResumeListGetResume(params, {
     query: {
       staleTime: 5 * 60 * 1000,
-      gcTime: 5 * 60 * 1000, // Shorter GC for paginated queries - it's page-specific
+      gcTime: 30 * 60 * 1000,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
-      retry: 1,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   });
 
