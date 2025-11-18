@@ -2,17 +2,17 @@
 
 An intelligent resume optimization platform that analyzes your CV against job descriptions, identifies missing keywords, calculates match scores, and generates customized cover letters—all powered by AI.
 
-## ✨ Key Features
+## Key Features
 
-- **📄 Resume Upload & Management** - Store multiple resumes with version tracking
-- **🎯 Job Description Analysis** - Paste job descriptions and get instant analysis
-- **📊 Match Score** - Real-time matching percentage with detailed breakdown
-- **🔑 Keyword Insights** - Discover missing and recommended keywords for better ATS compatibility
-- **📝 Cover Letter Generation** - AI-powered cover letters tailored to job descriptions
-- **📈 Performance Analytics** - Track resume performance metrics and trends
-- **💾 Resume History** - View and compare analysis history
+- **Resume Upload & Management** - Store multiple resumes with version tracking
+- **Job Description Analysis** - Paste job descriptions and get instant analysis
+- **Match Score** - Real-time matching percentage with detailed breakdown
+- **Keyword Insights** - Discover missing and recommended keywords for better ATS compatibility
+- **Cover Letter Generation** - AI-powered cover letters tailored to job descriptions
+- **Performance Analytics** - Track resume performance metrics and trends
+- **Resume History** - View and compare analysis history
 
-## 🚀 How It Works
+## How It Works
 
 1. Upload your resume (PDF, DOCX, or TXT)
 2. Enter a job description or job URL
@@ -23,7 +23,7 @@ An intelligent resume optimization platform that analyzes your CV against job de
 
 ![Demo](./demo.gif)
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS, Shadcn/UI
 - **Backend**: Deno, Express, TypeScript, Prisma ORM
@@ -31,7 +31,7 @@ An intelligent resume optimization platform that analyzes your CV against job de
 - **Storage**: Supabase Storage for resume files
 - **AI Integration**: LLM-powered analysis and cover letter generation
 
-## 📦 Project Structure
+## Project Structure
 
 ```bash
 ├── frontend/          # Next.js web application
@@ -47,7 +47,7 @@ An intelligent resume optimization platform that analyzes your CV against job de
 └── README.md          # This file
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 See individual README files:
 
