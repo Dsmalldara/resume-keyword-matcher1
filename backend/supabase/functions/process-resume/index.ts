@@ -1,72 +1,83 @@
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { createGroq } from '@ai-sdk/groq';
-import { extractDocxText } from '../../_shared/extractDocxText.ts';
-import { extractTxtText } from '../../_shared/extractTxtText.ts';
-import { extractPdfText } from '../../_shared/pdf-extractor.ts';
-import { createId } from 'https://esm.sh/@paralleldrive/cuid2@2.2.2';
-
+import { createGroq } from "@ai-sdk/groq";
+import { extractDocxText } from "../../_shared/extractDocxText.ts";
+import { extractTxtText } from "../../_shared/extractTxtText.ts";
+import { extractPdfText } from "../../_shared/pdf-extractor.ts";
+import { createId } from "https://esm.sh/@paralleldrive/cuid2@2.2.2";
 
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "text/plain",
-  "application/rtf"
+  "application/rtf",
 ];
 
 // Helper: retry fetching resume by storageKey
 
-
-
 serve(async (req: Request) => {
   console.log("===== Function hit =====");
-  console.log("SUPABASE_URL:", Deno.env.get('SUPABASE_URL'));
-  console.log("SUPABASE_SERVICE_ROLE_KEY present:", !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
-
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  console.log("SUPABASE_URL:", Deno.env.get("SUPABASE_URL"));
+  console.log(
+    "SUPABASE_SERVICE_ROLE_KEY present:",
+    !!Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
   );
 
-  const event = await req.json() as { type: string; table: string; record: { name: string } };
-  console.log('Received event:', event);
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  const event = (await req.json()) as {
+    type: string;
+    table: string;
+    record: { name: string };
+  };
+  console.log("Received event:", event);
 
   try {
     if (event.type === "INSERT" && event.table === "objects") {
       const filepath = event.record.name;
-      console.log('Processing file:', filepath);
+      console.log("Processing file:", filepath);
 
       // Extract storageKey and uploadId from filepath
-      const pathParts = filepath.split('/');
+      const pathParts = filepath.split("/");
       if (pathParts.length < 3) {
-        console.error('Invalid file path structure:', filepath);
+        console.error("Invalid file path structure:", filepath);
         return new Response("Invalid file path structure", { status: 400 });
       }
 
       const resumeId = pathParts[1];
-      const filename = pathParts.slice(2).join('/'); 
+      const filename = pathParts.slice(2).join("/");
       const storageKey = pathParts[0];
 
-      console.log('Extracted values -> storageKey:', storageKey, 'resumeId:', resumeId, 'filename:', filename);
+      console.log(
+        "Extracted values -> storageKey:",
+        storageKey,
+        "resumeId:",
+        resumeId,
+        "filename:",
+        filename,
+      );
 
       // 1. Download file
       const { data: fileData, error: downloadError } = await supabase.storage
-        .from('resumes')
+        .from("resumes")
         .download(filepath);
 
       if (downloadError || !fileData) {
-        console.error('Download error:', downloadError);
+        console.error("Download error:", downloadError);
         return new Response("Error downloading file", { status: 500 });
       }
 
-      console.log('File downloaded successfully, MIME type:', fileData.type);
+      console.log("File downloaded successfully, MIME type:", fileData.type);
 
       const contentType = fileData.type;
       if (!ALLOWED_MIME_TYPES.includes(contentType)) {
-        console.error('File type not allowed:', contentType);
+        console.error("File type not allowed:", contentType);
         return new Response("File type not allowed", { status: 400 });
       }
 
@@ -76,7 +87,8 @@ serve(async (req: Request) => {
         rawText = await extractPdfText(fileData);
       } else if (
         contentType === "application/msword" ||
-        contentType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        contentType ===
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       ) {
         rawText = await extractDocxText(fileData);
       } else if (contentType === "text/plain") {
@@ -85,32 +97,36 @@ serve(async (req: Request) => {
         return new Response("Unsupported file type", { status: 400 });
       }
 
-      console.log('Extracted text length:', rawText.length);
+      console.log("Extracted text length:", rawText.length);
 
       // 3. Parse with Gemini
       const parsedData = await processResume(rawText);
-      console.log('Parsed resume data successfully:', {
+      console.log("Parsed resume data successfully:", {
         candidateName: parsedData.candidateName,
         email: parsedData.email,
         phone: parsedData.phone,
       });
 
       // 4. Check if ResumeContent already exists
-      console.log('Checking if resume_contents record exists for resumeId:', resumeId);
+      console.log(
+        "Checking if resume_contents record exists for resumeId:",
+        resumeId,
+      );
       const { data: existingContent, error: selectError } = await supabase
-        .from('resume_contents')
-        .select('id')
-        .eq('resumeId', resumeId)
+        .from("resume_contents")
+        .select("id")
+        .eq("resumeId", resumeId)
         .single();
 
-      if (selectError) console.warn('Select error (may be null if not found):', selectError);
-      console.log('Existing content found:', !!existingContent);
+      if (selectError)
+        console.warn("Select error (may be null if not found):", selectError);
+      console.log("Existing content found:", !!existingContent);
 
       if (existingContent) {
         // Update existing
-        console.log('Updating existing resume_contents record');
+        console.log("Updating existing resume_contents record");
         const { error: updateError } = await supabase
-          .from('resume_contents')
+          .from("resume_contents")
           .update({
             candidateName: parsedData.candidateName,
             email: parsedData.email,
@@ -121,22 +137,22 @@ serve(async (req: Request) => {
             certifications: parsedData.certifications,
             projects: parsedData.projects,
             rawText: parsedData.rawText,
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date(),
+            // Remove createdAt - it should never be updated
           })
-          .eq('resumeId', resumeId);
+          .eq("resumeId", resumeId);
 
         if (updateError) {
-          console.error('Database update error:', updateError);
+          console.error("Database update error:", updateError);
           return new Response("Error updating database", { status: 500 });
         }
       } else {
         // Insert new
-        const now = new Date().toISOString();
-        console.log('Inserting new resume_contents record');
+        console.log("Inserting new resume_contents record");
         const { error: insertError } = await supabase
-          .from('resume_contents')
+          .from("resume_contents")
           .insert({
-            id: createId(),                        
+            id: createId(),
             resumeId: resumeId,
             candidateName: parsedData.candidateName,
             email: parsedData.email,
@@ -147,56 +163,34 @@ serve(async (req: Request) => {
             certifications: parsedData.certifications,
             projects: parsedData.projects,
             rawText: parsedData.rawText,
-            createdAt: now,                         
-            updatedAt: now                          
+            createdAt: new Date(),
+            updatedAt: new Date(),
           });
-          const {error:changeStatusError} = await supabase.from('resumes')
-          .update({status:'processed',
-              updatedAt: new Date().toISOString() 
-          })
-          .eq('id',resumeId)
-          if(changeStatusError){
-            console.error('Error updating resume status:', changeStatusError);
-            return new Response("Error updating resume status", { status: 500 });
-          }
-
-        if (insertError) {
-          console.error('Database insert error:', insertError);
-          await supabase.from('resumes')
-          .update({status:'analysis failed',
-              updatedAt: new Date().toISOString() 
-          }
-          )
-          .eq('id',resumeId);
-          return new Response("Error inserting into database", { status: 500 });
-        }
       }
 
-      console.log('Saved to resume_contents table successfully');
+      console.log("Saved to resume_contents table successfully");
 
       return new Response(
-        JSON.stringify({ 
-          status: 'ok', 
+        JSON.stringify({
+          status: "ok",
           resumeId,
-          message: 'Resume processed successfully' 
-        }), 
-        { status: 200 }
+          message: "Resume processed successfully",
+        }),
+        { status: 200 },
       );
     }
 
-    console.log('Event ignored:', event.type, event.table);
-    return new Response(JSON.stringify({ status: 'ignored' }), { status: 200 });
-
+    console.log("Event ignored:", event.type, event.table);
+    return new Response(JSON.stringify({ status: "ignored" }), { status: 200 });
   } catch (err) {
-    console.error('Unexpected error:', err);
+    console.error("Unexpected error:", err);
     const errorMessage = err instanceof Error ? err.message : String(err);
     return new Response(
-      JSON.stringify({ error: 'Internal Server Error', details: errorMessage }), 
-      { status: 500 }
+      JSON.stringify({ error: "Internal Server Error", details: errorMessage }),
+      { status: 500 },
     );
   }
 });
-
 
 // STEP 1: Parse structured data with token optimization
 async function parseResumeWithGemini(rawText: string) {
@@ -309,7 +303,7 @@ ${JSON.stringify(parsedResume, null, 2)}
     model,
     prompt,
     temperature: 0.3,
-    maxOutputTokens: 400,  // Reduced from 700
+    maxOutputTokens: 400, // Reduced from 700
   });
 
   return text.trim();

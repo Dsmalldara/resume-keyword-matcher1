@@ -1,25 +1,18 @@
 import { queryKeys } from "@/lib/utils";
 import { useGetResumeListGetResume } from "@/api/generated/resume/resume";
 import { GetResumeListGetResumeParams } from "@/api/models";
-
+import { useQuery } from "@tanstack/react-query";
+import { getResumeListGetResume } from "@/api/generated/resume/resume";
 /**
  * Fetches all resumes without pagination
  * Used for dropdowns and selections across the app
  * Cache is shared and persisted indefinitely
  */
 export const useFetchResumes = () => {
-  const query = useGetResumeListGetResume(undefined, {
-    query: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: Infinity,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      retry: 1,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    },
+  return useQuery({
+    queryKey: [queryKeys.resume, "all"],
+    queryFn: () => getResumeListGetResume({ perPage: 1000 }),
   });
-
-  return query;
 };
 
 /**
