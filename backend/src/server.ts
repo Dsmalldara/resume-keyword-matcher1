@@ -144,8 +144,9 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+const PORT = parseInt(process.env.PORT || "8080", 10);
+const HOST = "0.0.0.0";
+app.listen(PORT, HOST, () => {
   logger.info(`Server running on port ${PORT}`);
   logger.info(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 });
