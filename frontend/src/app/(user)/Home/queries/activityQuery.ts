@@ -18,5 +18,6 @@ export const useRecentActivity = (
     queryFn: () => getActivityRecent({ limit }),
     enabled,
     refetchInterval,
+    refetchOnMount: true,
   });
 };

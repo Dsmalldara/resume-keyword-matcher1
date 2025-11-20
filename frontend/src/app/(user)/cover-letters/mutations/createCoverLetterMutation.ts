@@ -14,10 +14,8 @@ export const useCreateCoverLetterMutation = () => {
           exact: false,
           refetchType: "active",
         });
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: [queryKeys.activity],
-          exact: false,
-          refetchType: "active",
         });
       },
       onError: (error) => {

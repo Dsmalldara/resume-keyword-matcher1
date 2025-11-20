@@ -17,6 +17,9 @@ export const useCreateAnalysisMutation = () => {
           exact: false,
           refetchType: "active",
         });
+        queryClient.refetchQueries({
+          queryKey: [queryKeys.activity],
+        });
       },
     },
   });

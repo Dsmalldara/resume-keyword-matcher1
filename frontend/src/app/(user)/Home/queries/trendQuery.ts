@@ -11,6 +11,7 @@ interface TrendRecord {
 export const useGetTrendQuery = (limit: number = 30) => {
   return useQuery({
     queryKey: ["analysis", "trend", limit],
+    refetchOnMount: true,
     queryFn: async (): Promise<TrendRecord[]> => {
       return customInstance({
         url: `/analysis/trend?limit=${limit}`,

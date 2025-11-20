@@ -45,13 +45,14 @@ export const useUploadFinalizeMutation = () => {
       retryDelay: 100,
       onSuccess: (data) => {
         console.log("File upload finalized successfully", data);
-        queryClient.invalidateQueries({
-          queryKey: [queryKeys.activity],
-          refetchType: "active",
-        });
+        // Invalidate all resume queries
         queryClient.invalidateQueries({
           queryKey: [queryKeys.resume],
           refetchType: "active",
+        });
+        // Invalidate activity
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.activity],
         });
       },
       onError: (error) => {
@@ -67,16 +68,14 @@ export const useDeleteResumeMutation = () => {
   return useDeleteResumeDeleteResumeId({
     mutation: {
       onSuccess: () => {
-        // Invalidate and refetch resume list
+        // Invalidate all resume queries
         queryClient.invalidateQueries({
           queryKey: [queryKeys.resume],
           refetchType: "active",
         });
-
-        // Refetch activity
+        // Invalidate activity
         queryClient.invalidateQueries({
           queryKey: [queryKeys.activity],
-          refetchType: "active",
         });
       },
       onError: () => {

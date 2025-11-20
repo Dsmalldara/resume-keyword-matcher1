@@ -8,6 +8,7 @@ export const useGetAverageImprovementInsights = () => {
   return useQuery({
     queryKey: [queryKeys.insights, queryKeys.analysis[1]],
     queryFn: () => getInsightsImprovementInsights(),
+    refetchOnMount: true,
   });
 };
 
@@ -17,6 +18,7 @@ export const useGetBestMatchScore = () => {
   return useQuery({
     queryKey: [queryKeys.insights, queryKeys.analysis[0]],
     queryFn: () => getInsightsBestMatch(),
+    refetchOnMount: true,
   });
 };
 
@@ -24,5 +26,6 @@ export const useGetJobAnalysisInsights = () => {
   return useQuery({
     queryKey: [queryKeys.insights, queryKeys.analysis[2]],
     queryFn: () => getInsightsJobsAnalyzed(),
+    refetchOnMount: true,
   });
 };

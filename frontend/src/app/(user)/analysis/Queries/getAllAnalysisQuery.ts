@@ -8,6 +8,7 @@ export const useGetAllAnalysisQuery = (
 ) => {
   const query = useQuery({
     queryKey: [queryKeys.analysis, param?.page ?? 1, param?.perPage ?? 10],
+
     queryFn: () => getAnalysisGetAnalysis(param),
   });
 

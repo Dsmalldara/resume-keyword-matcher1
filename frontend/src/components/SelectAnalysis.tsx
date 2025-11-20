@@ -1,9 +1,15 @@
-import { Label } from '@radix-ui/react-label'
-import { Building, FileText } from 'lucide-react'
-import React from 'react'
-import { Badge } from './ui/badge'
+import { Label } from "@radix-ui/react-label";
+import { Building, FileText } from "lucide-react";
+import React from "react";
+import { Badge } from "./ui/badge";
 import { GetAnalysisGetAnalysis200DataItem } from "@/api/models";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 type SelectResumeProps = {
   analysis: GetAnalysisGetAnalysis200DataItem[];
@@ -13,7 +19,13 @@ type SelectResumeProps = {
   selectedAnalysis: string;
 };
 
-function SelectAnalysis({ analysis, isLoading, isError,selectedAnalysis, setSelectedAnalysis}: SelectResumeProps) {
+function SelectAnalysis({
+  analysis,
+  isLoading,
+  isError,
+  selectedAnalysis,
+  setSelectedAnalysis,
+}: SelectResumeProps) {
   return (
     <div className="space-y-2">
       <Label htmlFor="resume-select" className="text-sm font-medium">
@@ -26,38 +38,43 @@ function SelectAnalysis({ analysis, isLoading, isError,selectedAnalysis, setSele
         value={selectedAnalysis}
       >
         <SelectTrigger>
-          <SelectValue 
+          <SelectValue
             placeholder={
-              isLoading ? "Loading analysis..." : 
-              isError ? "Error loading analysis" : 
-              "Select an analysis"
-            } 
+              isLoading
+                ? "Loading analysis..."
+                : isError
+                  ? "Error loading analysis"
+                  : "Select an analysis"
+            }
           />
         </SelectTrigger>
         {analysis.length > 0 ? (
           <SelectContent>
             {analysis.map((analysis) => (
               <SelectItem
-                    key={analysis.id}
-                    value={analysis.id || ""}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2">
-                        <Building className="w-4 h-4" />
-                        <span>
-                          {analysis.jobTitle} at {analysis.jobCompany}
-                        </span>
-                      </div>
-                      <Badge variant="outline" className="ml-2 text-xs">
-                        {analysis.matchScore}% match
-                      </Badge>
-                    </div>
-                  </SelectItem>
+                key={analysis.id}
+                value={analysis.id || ""}
+                className="flex flex-wrap"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-2">
+                    <Building className="w-4 h-4" />
+                    <span className="flex flex-wrap">
+                      {analysis.jobTitle} at {analysis.jobCompany}
+                    </span>
+                  </div>
+                  <Badge variant="outline" className="ml-2 text-xs">
+                    {analysis.matchScore}% match
+                  </Badge>
+                </div>
+              </SelectItem>
             ))}
           </SelectContent>
         ) : (
           <SelectContent>
-            <SelectItem value="no-resumes" disabled>No resumes available</SelectItem>
+            <SelectItem value="no-resumes" disabled>
+              No resumes available
+            </SelectItem>
           </SelectContent>
         )}
       </Select>
@@ -65,4 +82,4 @@ function SelectAnalysis({ analysis, isLoading, isError,selectedAnalysis, setSele
   );
 }
 
-export default SelectAnalysis
+export default SelectAnalysis;
