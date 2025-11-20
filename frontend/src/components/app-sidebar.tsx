@@ -1,4 +1,5 @@
 import { Home, FileText, BarChart2, PenLine, Settings } from "lucide-react";
+import Link from "next/link";
 
 import {
   Sidebar,
@@ -48,10 +49,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title} className="py-2">
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon className="w-4 h-4 md:w-5 md:h-5" />
                       <span className="text-sm md:text-base">{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
