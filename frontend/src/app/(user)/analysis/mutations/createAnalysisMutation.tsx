@@ -10,10 +10,12 @@ export const useCreateAnalysisMutation = () => {
         queryClient.invalidateQueries({
           queryKey: [queryKeys.analysis],
           exact: false,
+          refetchType: "active",
         });
         queryClient.invalidateQueries({
           queryKey: [queryKeys.insights],
           exact: false,
+          refetchType: "active",
         });
       },
     },

@@ -1,5 +1,10 @@
-import { useDeleteResumeDeleteResumeId, usePostResumeUploadPresign } from "@/api/generated/resume/resume";
-import { usePostResumeUploadComplete,usePostResumeUploadFinalize,
+import {
+  useDeleteResumeDeleteResumeId,
+  usePostResumeUploadPresign,
+} from "@/api/generated/resume/resume";
+import {
+  usePostResumeUploadComplete,
+  usePostResumeUploadFinalize,
 } from "@/api/generated/resume/resume";
 import { queryKeys } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,9 +45,14 @@ export const useUploadFinalizeMutation = () => {
       retryDelay: 100,
       onSuccess: (data) => {
         console.log("File upload finalized successfully", data);
-        queryClient.invalidateQueries({ queryKey: [queryKeys.activity] });
-        queryClient.invalidateQueries({ queryKey: [queryKeys.resume] });
-        
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.activity],
+          refetchType: "active",
+        });
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.resume],
+          refetchType: "active",
+        });
       },
       onError: (error) => {
         console.error("Error finalizing file upload", error);
@@ -51,20 +61,23 @@ export const useUploadFinalizeMutation = () => {
   });
 };
 
-
-
 export const useDeleteResumeMutation = () => {
   const queryClient = useQueryClient();
 
   return useDeleteResumeDeleteResumeId({
     mutation: {
       onSuccess: () => {
-        // Invalidate resume list
-        queryClient.invalidateQueries({ queryKey: [queryKeys.resume] });
-        
+        // Invalidate and refetch resume list
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.resume],
+          refetchType: "active",
+        });
+
         // Refetch activity
-        queryClient.invalidateQueries({ queryKey: [queryKeys.activity] });
-        
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.activity],
+          refetchType: "active",
+        });
       },
       onError: () => {
         console.error("Error deleting resume");

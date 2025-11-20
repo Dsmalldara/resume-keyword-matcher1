@@ -15,10 +15,12 @@ export const useDeleteCoverLetter = () => {
         queryClient.invalidateQueries({
           queryKey: [queryKeys.coverletters],
           exact: false,
+          refetchType: "active",
         });
         queryClient.invalidateQueries({
           queryKey: [queryKeys.activity],
           exact: false,
+          refetchType: "active",
         });
       },
     },

@@ -1,5 +1,10 @@
 "use client";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { FileText, User, Building, Calendar, Eye, Mail } from "lucide-react";
 import { SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,27 +18,20 @@ import AnalysisHighlight from "./AnalysisHighlight";
 const AnalysisCards = ({
   setSelectedAnalysis,
   setIsDetailsOpen,
-  analysisData
+  analysisData,
 }: {
-  setSelectedAnalysis: (analysis: SetStateAction<GetAnalysisGetAnalysis200DataItem | null>) => void;
+  setSelectedAnalysis: (
+    analysis: SetStateAction<GetAnalysisGetAnalysis200DataItem | null>,
+  ) => void;
   setIsDetailsOpen: (isOpen: boolean) => void;
   analysisData?: GetAnalysisGetAnalysis200DataItem[];
 }) => {
-
-
-
-
-
-const getMatchBadge = (score: number | undefined) => {
+  const getMatchBadge = (score: number | undefined) => {
     if (score === undefined) return null;
     if (score >= 80) {
-      return    ( 
-          <Badge className={getStatusColor("Strong")}>
-            Excellent Match
-          </Badge>
-         )
-
-
+      return (
+        <Badge className={getStatusColor("Strong")}>Excellent Match</Badge>
+      );
     } else if (score >= 50) {
       return <Badge className={getStatusColor("Good")}>Good Match</Badge>;
     } else {
@@ -41,9 +39,12 @@ const getMatchBadge = (score: number | undefined) => {
     }
   };
   return (
- <>
+    <>
       {analysisData?.map((analysis) => (
-        <Card key={analysis.id} className="hover:shadow-lg transition-all duration-200">
+        <Card
+          key={analysis.id}
+          className="hover:shadow-lg transition-all duration-200"
+        >
           <CardHeader className="pb-4">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-2 flex-1 min-w-0">
@@ -64,11 +65,12 @@ const getMatchBadge = (score: number | undefined) => {
                   </p>
                   <p className="text-xs text-muted-foreground flex items-center gap-2">
                     <Calendar className="w-4 h-4 flex-shrink-0" />
-                    {analysis.createdAt && new Date(analysis.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {analysis.createdAt &&
+                      new Date(analysis.createdAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
                   </p>
                 </div>
               </div>
@@ -79,18 +81,14 @@ const getMatchBadge = (score: number | undefined) => {
           </CardHeader>
 
           <CardContent className="space-y-5">
-              
-              {getMatchBadge(analysis.matchScore)}
+            {getMatchBadge(analysis.matchScore)}
 
             {/* Summary */}
             <div className="p-4 bg-muted/50 rounded-lg border">
-              <p className="text-sm leading-relaxed">
-                {analysis.summary}
-              </p>
+              <p className="text-sm leading-relaxed">{analysis.summary}</p>
             </div>
-           
 
-           {/* Highlights  Section*/}
+            {/* Highlights  Section*/}
             <AnalysisHighlight
               score={analysis.matchScore || 0}
               strengths={analysis.strengths}
@@ -109,10 +107,6 @@ const getMatchBadge = (score: number | undefined) => {
             >
               <Eye className="w-4 h-4 mr-2" />
               View Details
-            </Button>
-            <Button variant="outline" className="flex-1">
-              <Mail className="w-4 h-4 mr-2" />
-              Cover Letter
             </Button>
           </CardFooter>
         </Card>
