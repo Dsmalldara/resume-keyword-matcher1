@@ -64,58 +64,90 @@
  *               $ref: '#/components/schemas/Error'
  */
 
-
-
-
-import { Router, Request, Response, NextFunction } from 'express';
-import  { supabase} from '../../../lib/supabase';
-import { type AuthResponse } from '@supabase/supabase-js';
+import { Router, Request, Response, NextFunction } from "express";
+import { supabase } from "../../../lib/supabase";
+import { type AuthResponse } from "@supabase/supabase-js";
 import logger from "../../../../utils/logger";
 
-import {  body, validationResult } from 'express-validator';
-import {   refreshTokenLimiter} from '../../../middleware/rateLimiter';
-import { refreshTokenValidations } from '../../../validations/authValidation';
+import { body, validationResult } from "express-validator";
+import { refreshTokenLimiter } from "../../../middleware/rateLimiter";
+import { refreshTokenValidations } from "../../../validations/authValidation";
 
 const router = Router();
 
+router.post(
+  "/refresh",
+  refreshTokenLimiter,
+  refreshTokenValidations,
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-router.post('/refresh', refreshTokenLimiter, refreshTokenValidations, async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  const refreshToken = req.cookies.refresh_token;
-  try{
-  const { data, error }: AuthResponse = await supabase.auth.refreshSession({ refresh_token: refreshToken });
+    const refreshToken = req.cookies.refresh_token;
 
-   if (error) return res.status(401).json({ error: error.message });
+    // Check if refresh token exists
+    if (!refreshToken) {
+      return res.status(401).json({ error: "No refresh token provided" });
+    }
 
-  res.cookie('refresh_token', data.session?.refresh_token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // ~7 days
-});
+    try {
+      const { data, error }: AuthResponse = await supabase.auth.refreshSession({
+        refresh_token: refreshToken,
+      });
 
-   return res.status(200).json({
-      message: 'Token refreshed, Login successful',
-      user: {
-        id: data.user?.id,
-        email: data.user?.email,
-        name: data.user?.user_metadata?.name,
-        bio: data.user?.user_metadata?.bio || null,
-        avatarUrl: data.user?.user_metadata?.avatar_url || null,
-        username: data.user?.user_metadata?.username || null,
-      },
-      access_token: data.session?.access_token,
-      
-    });
-  }
-    catch (error: any) {
-    logger.error('Error refreshing token', { error });
-    res.status(500).json({ error: error.message });
-  }
-});
+      if (error) {
+        // Clear invalid/expired refresh token
+        res.clearCookie("refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        });
 
+        logger.warn("Refresh token invalid or expired", {
+          error: error.message,
+        });
+        return res.status(401).json({
+          error: "Session expired, please login again",
+          code: "REFRESH_TOKEN_EXPIRED",
+        });
+      }
 
-export default router
+      // Ensure session data exists
+      if (!data.session || !data.session.refresh_token) {
+        return res
+          .status(500)
+          .json({ error: "Invalid session response from auth provider" });
+      }
+
+      // Set new refresh token
+      res.cookie("refresh_token", data.session.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
+      return res.status(200).json({
+        message: "Token refreshed successfully",
+        user: {
+          id: data.user?.id,
+          email: data.user?.email,
+          name: data.user?.user_metadata?.name,
+          bio: data.user?.user_metadata?.bio || null,
+          avatarUrl: data.user?.user_metadata?.avatar_url || null,
+          username: data.user?.user_metadata?.username || null,
+        },
+        access_token: data.session.access_token,
+      });
+    } catch (error: any) {
+      logger.error("Error refreshing token", { error });
+      return res
+        .status(500)
+        .json({ error: "Internal server error during token refresh" });
+    }
+  },
+);
+
+export default router;

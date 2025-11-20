@@ -3,17 +3,45 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/StatusBadge";
 import { Resume } from "@/api/models";
+import { useDeleteResumeMutation } from "../../Home/mutations/resumeMutation";
+import { DeleteAlertDialog } from "@/components/DeleteAlertDialog";
+import { getErrorMessage } from "@/lib/utils";
+import { toast } from "sonner";
+import { useState } from "react";
 
-const MobileResumeCards = ({ 
-  resumes, 
+const MobileResumeCards = ({
+  resumes,
   isLoading,
-  onDelete 
-}: { 
-  resumes: Resume[], 
-  isLoading: boolean,
-  onDelete?: (id: string) => void 
-}) => { 
-  
+}: {
+  resumes: Resume[];
+  isLoading: boolean;
+}) => {
+  const { mutate: deleteResume, isPending } = useDeleteResumeMutation();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [resumeToDelete, setResumeToDelete] = useState<string | null>(null);
+
+  const onDeleteResume = (resumeId: string) => {
+    deleteResume(
+      { resumeId },
+      {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setResumeToDelete(null);
+          setTimeout(() => {
+            toast.success("Resume deleted successfully");
+          }, 100);
+        },
+        onError: (error) => {
+          setDeleteDialogOpen(false);
+          setResumeToDelete(null);
+          setTimeout(() => {
+            toast.error(getErrorMessage(error));
+          }, 100);
+        },
+      },
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -39,8 +67,8 @@ const MobileResumeCards = ({
   return (
     <div className="space-y-2">
       {resumes?.map((resume) => (
-        <Card 
-          key={resume.id} 
+        <Card
+          key={resume.id}
           className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
         >
           <CardContent className="p-3">
@@ -56,32 +84,49 @@ const MobileResumeCards = ({
                 <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
                   <Clock className="w-3 h-3" />
                   <span>
-                    {resume.createdAt 
-                      ? new Date(resume.createdAt).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
+                    {resume.createdAt
+                      ? new Date(resume.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
                         })
-                      : 'N/A'
-                    }
+                      : "N/A"}
                   </span>
                 </div>
               </div>
-              <StatusBadge status={(resume).status ?? 'pending'} />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => resume.id && onDelete?.(resume.id)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 h-8 w-8 p-0"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+              <StatusBadge status={resume.status ?? "pending"} />
+              <DeleteAlertDialog
+                open={deleteDialogOpen && resumeToDelete === resume.id}
+                onOpenChange={(open) => {
+                  setDeleteDialogOpen(open);
+                  if (!open) setResumeToDelete(null);
+                }}
+                trigger={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 h-8 w-8 p-0"
+                    onClick={() => {
+                      setResumeToDelete(resume.id ?? null);
+                      setDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                }
+                title="Delete Resume?"
+                description="This action cannot be undone. This will permanently delete your resume and all associated data."
+                onConfirm={() => {
+                  if (resume.id) onDeleteResume(resume.id);
+                }}
+                isLoading={isPending}
+              />
             </div>
           </CardContent>
         </Card>
       ))}
     </div>
   );
-}
+};
 
 export default MobileResumeCards;
