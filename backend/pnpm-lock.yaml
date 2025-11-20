@@ -14,9 +14,6 @@ importers:
       '@ai-sdk/groq':
         specifier: ^2.0.28
         version: 2.0.28(zod@4.1.11)
-      '@prisma/client':
-        specifier: 6.16.2
-        version: 6.16.2(prisma@6.16.2(typescript@5.9.2))(typescript@5.9.2)
       '@sentry/node':
         specifier: ^10.13.0
         version: 10.13.0
@@ -126,6 +123,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^19.8.1
         version: 19.8.1
+      '@prisma/client':
+        specifier: ^6.0.0
+        version: 6.16.2(prisma@6.16.2(typescript@5.9.2))(typescript@5.9.2)
       '@types/cookie-parser':
         specifier: ^1.4.10
         version: 1.4.10(@types/express@5.0.4)
@@ -190,7 +190,7 @@ importers:
         specifier: ^3.6.2
         version: 3.6.2
       prisma:
-        specifier: ^6.16.2
+        specifier: ^6.0.0
         version: 6.16.2(typescript@5.9.2)
       supertest:
         specifier: ^7.1.4

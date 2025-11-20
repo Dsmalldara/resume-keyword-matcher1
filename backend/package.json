@@ -30,7 +30,6 @@
   "dependencies": {
     "@ai-sdk/google": "^2.0.26",
     "@ai-sdk/groq": "^2.0.28",
-    "@prisma/client": "6.16.2",
     "@sentry/node": "^10.13.0",
     "@supabase/supabase-js": "^2.57.4",
     "@ts-rest/core": "^3.52.1",
@@ -91,7 +90,8 @@
     "lint-staged": "^16.2.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
-    "prisma": "^6.16.2",
+     "prisma": "^6.0.0",
+    "@prisma/client": "^6.0.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.4",
     "ts-node": "^10.9.2",
