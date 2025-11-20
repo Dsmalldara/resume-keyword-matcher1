@@ -11,8 +11,8 @@ RUN pnpm install
 
 COPY . .
 
-# Generate Prisma client first, then build TypeScript
-RUN npx prisma generate && pnpm run build
+# MUST be "pnpm prisma" not "npx prisma"
+RUN pnpm prisma generate && pnpm run build
 
 # --- Stage 2: Production Runtime Environment ---
 FROM node:20-slim AS production
@@ -26,15 +26,13 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
-# Install production dependencies
 RUN pnpm install --prod
 
-# Copy built files
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
-# Generate Prisma client in production stage (this creates node_modules/.prisma)
-RUN npx prisma generate
+# MUST be "pnpm prisma" not "npx prisma"
+RUN pnpm prisma generate
 
 EXPOSE 8080
 
