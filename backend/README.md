@@ -2,6 +2,8 @@
 
 The backend server for Resume Keyword Matcher built with Express.js, TypeScript, and PostgreSQL. Handles resume processing, AI-powered analysis, authentication, and activity tracking.
 
+Deployed on Fly.io with Docker containers.
+
 ## Technology Stack
 
 - Express.js - HTTP server framework
