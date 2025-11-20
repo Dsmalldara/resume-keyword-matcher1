@@ -1,3 +1,5 @@
+"use client";
+
 import { Home, FileText, BarChart2, PenLine, Settings } from "lucide-react";
 import Link from "next/link";
 
@@ -10,6 +12,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 // Menu items for Resume Analyzer Dashboard
@@ -37,6 +40,15 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    // Only close sidebar on mobile after navigation
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   return (
     <Sidebar collapsible="icon" className="hidden md:flex">
       <SidebarContent>
@@ -49,7 +61,7 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title} className="py-2">
                   <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={handleLinkClick}>
                       <item.icon className="w-4 h-4 md:w-5 md:h-5" />
                       <span className="text-sm md:text-base">{item.title}</span>
                     </Link>

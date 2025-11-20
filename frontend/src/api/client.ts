@@ -33,15 +33,45 @@ AXIOS_INSTANCE.interceptors.request.use(
 
   (error) => Promise.reject(error),
 );
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: any) => void;
+  reject: (error?: any) => void;
+}> = [];
+
+const processQueue = (error: any = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
+  failedQueue = [];
+};
 
 AXIOS_INSTANCE.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Check if error.response exists before accessing it
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Queue this request while refresh is in progress
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => {
+            originalRequest.headers[`Authorization`] =
+              `Bearer ${getAccessToken()}`;
+            originalRequest.withCredentials = true;
+            return AXIOS_INSTANCE(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
         const { data } = await axios.post(
@@ -49,25 +79,29 @@ AXIOS_INSTANCE.interceptors.response.use(
           {},
           { withCredentials: true },
         );
+
         storeAccessToken(data.access_token);
         originalRequest.headers[`Authorization`] =
           `Bearer ${data.access_token}`;
+        originalRequest.withCredentials = true;
+
+        processQueue(null);
+        isRefreshing = false;
+
         return AXIOS_INSTANCE(originalRequest);
       } catch (refreshError) {
+        processQueue(refreshError);
+        isRefreshing = false;
+
         if (typeof window !== "undefined") {
           localStorage.removeItem("access_token");
-
           document.cookie = `access_token=; path=/; samesite=lax; secure; max-age=0`;
-
-          // Use window.location for client-side redirect
           window.location.href = "/auth/login";
         }
-
         return Promise.reject(refreshError);
       }
     }
 
-    // Important: reject the error so it propagates
     return Promise.reject(error);
   },
 );
