@@ -1,10 +1,7 @@
 # --- Stage 1: Build & Prune Dependencies ---
 FROM node:20-slim AS builder
 
-# Install OpenSSL for Prisma
 RUN apt-get update -y && apt-get install -y openssl
-
-# Install pnpm globally
 RUN npm install -g pnpm
 
 WORKDIR /app
@@ -19,7 +16,6 @@ RUN pnpm run build && pnpm run prisma:generate:prod
 # --- Stage 2: Production Runtime Environment ---
 FROM node:20-slim AS production
 
-# Install OpenSSL for Prisma
 RUN apt-get update -y && apt-get install -y openssl
 
 ENV NODE_ENV=production
@@ -34,7 +30,9 @@ RUN pnpm install --prod
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY .env.development.local .env.development.local
+
+# Remove this line - use Fly.io secrets instead
+# COPY .env.development.local .env.development.local
 
 EXPOSE 8080
 
