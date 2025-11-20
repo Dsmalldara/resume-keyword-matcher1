@@ -79,93 +79,102 @@
  *                   example: Failed to fetch resumes
  */
 
-
-import {Router,Request,Response} from "express";
+import { Router, Request, Response } from "express";
 import { AuthMiddleware } from "../../middleware/auth";
 import { getStorageKey } from "./resumeUtils";
 import prisma from "../../lib/prisma";
 import logger from "../../../utils/logger";
 
-
 const router = Router();
 
-router.get('/list/getResume', AuthMiddleware, async (req: Request, res: Response) => {
+router.get(
+  "/list/getResume",
+  AuthMiddleware,
+  async (req: Request, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     // Pagination params
     const page = parseInt((req.query.page as string) || "1", 10);
     const perPage = parseInt((req.query.perPage as string) || "10", 10);
 
-    if (Number.isNaN(page) || Number.isNaN(perPage) || page < 1 || perPage < 1 || perPage > 100) {
-        return res.status(400).json({ error: 'Invalid pagination parameters' });
+    if (
+      Number.isNaN(page) ||
+      Number.isNaN(perPage) ||
+      page < 1 ||
+      perPage < 1 ||
+      perPage > 1000
+    ) {
+      return res.status(400).json({ error: "Invalid pagination parameters" });
     }
 
     try {
-        const storageKey = await getStorageKey(userId);
-        if (!storageKey) {
-            return res.status(400).json({ error: "User profile not configured for uploads" });
+      const storageKey = await getStorageKey(userId);
+      if (!storageKey) {
+        return res
+          .status(400)
+          .json({ error: "User profile not configured for uploads" });
+      }
+
+      const where = { storageKey, deletedAt: null };
+
+      // total count for pagination
+      const totalItems = await prisma.resume.count({ where });
+
+      const resumes = await prisma.resume.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        include: { ResumeContent: true },
+        skip: (page - 1) * perPage,
+        take: perPage,
+      });
+
+      const MIN_PROCESSING_TIME = 45 * 1000; // 45 seconds
+
+      const safeResumes = resumes.map((resume) => {
+        const timeSinceCreation = Date.now() - resume.createdAt.getTime();
+        let status = resume.status;
+
+        // Only check status if enough time has passed
+        if (timeSinceCreation > MIN_PROCESSING_TIME) {
+          if (resume.ResumeContent.length > 0) {
+            status = "processed";
+          } else if (status === "pending" || status === "processing") {
+            status = "failed";
+          }
         }
 
-        const where = { storageKey, deletedAt: null };
+        return {
+          id: resume.id,
+          name: resume.name,
+          createdAt: resume.createdAt,
+          updatedAt: resume.updatedAt,
+          isActive: resume.isActive,
+          version: resume.version,
+          status: status, // Use computed status
+          fileSize: Number(resume.fileSize),
+        };
+      });
 
-        // total count for pagination
-        const totalItems = await prisma.resume.count({ where });
+      const totalPages = Math.ceil(totalItems / perPage) || 1;
 
-        const resumes = await prisma.resume.findMany({
-            where,
-            orderBy: { createdAt: 'desc' },
-            include: { ResumeContent: true },
-            skip: (page - 1) * perPage,
-            take: perPage,
-        });
-
-        const MIN_PROCESSING_TIME = 45 * 1000; // 45 seconds
-
-        const safeResumes = resumes.map(resume => {
-            const timeSinceCreation = Date.now() - resume.createdAt.getTime();
-            let status = resume.status;
-
-            // Only check status if enough time has passed
-            if (timeSinceCreation > MIN_PROCESSING_TIME) {
-                if (resume.ResumeContent.length > 0) {
-                    status = 'processed';
-                } else if (status === 'pending' || status === 'processing') {
-                    status = 'failed';
-                }
-            }
-
-            return {
-                id: resume.id,
-                name: resume.name,
-                createdAt: resume.createdAt,
-                updatedAt: resume.updatedAt,
-                isActive: resume.isActive,
-                version: resume.version,
-                status: status, // Use computed status
-                fileSize: Number(resume.fileSize),
-            };
-        });
-
-        const totalPages = Math.ceil(totalItems / perPage) || 1;
-
-        res.json({
-            message: 'Resumes fetched successfully',
-            resumes: safeResumes,
-            pagination: {
-                page,
-                perPage,
-                totalItems,
-                totalPages,
-            },
-        });
+      res.json({
+        message: "Resumes fetched successfully",
+        resumes: safeResumes,
+        pagination: {
+          page,
+          perPage,
+          totalItems,
+          totalPages,
+        },
+      });
     } catch (error) {
-        logger.error('Failed to fetch resumes', { error });
-        res.status(500).json({ error: 'Failed to fetch resumes' });
+      logger.error("Failed to fetch resumes", { error });
+      res.status(500).json({ error: "Failed to fetch resumes" });
     }
-});
+  },
+);
 
 export default router;
-

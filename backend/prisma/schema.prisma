@@ -72,6 +72,7 @@ model Resume {
 
   @@index([profileId, deletedAt])
   @@index([profileId, isActive])
+  @@index([storageKey, deletedAt, createdAt])
   @@map("resumes")
   ResumeContent ResumeContent[]
 }
@@ -154,7 +155,7 @@ model Analysis {
   resume       Resume         @relation(fields: [resumeId], references: [id], onDelete: Cascade)
   coverLetters CoverLetter[]
 
-  @@index([profileId, deletedAt])
+  @@index([profileId, matchScore, deletedAt])
   @@index([resumeId])
   @@index([jobId])
   @@index([status])

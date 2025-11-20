@@ -1,8 +1,15 @@
 // components/ui/delete-alert-dialog.tsx
 import {
-  AlertDialog, AlertDialogAction,
-  AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, 
-  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,} from "@/components/ui/alert-dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { ReactNode } from "react";
 
 interface DeleteAlertDialogProps {
@@ -11,6 +18,8 @@ interface DeleteAlertDialogProps {
   description?: string;
   onConfirm: () => void;
   isLoading?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function DeleteAlertDialog({
@@ -19,19 +28,16 @@ export function DeleteAlertDialog({
   description = "This action cannot be undone. This will permanently delete this item.",
   onConfirm,
   isLoading = false,
+  open,
+  onOpenChange,
 }: DeleteAlertDialogProps) {
-
-     const handleConfirm = () => {
+  const handleConfirm = () => {
     onConfirm();
-    // Don't close here - let the parent close it after success
   };
 
-
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        {trigger}
-      </AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
