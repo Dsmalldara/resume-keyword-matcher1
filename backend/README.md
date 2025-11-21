@@ -91,7 +91,7 @@ Start the development server:
 pnpm dev
 ```
 
-The server runs on http://localhost:4000
+The server runs on https://resume-checker.fly.dev
 
 ### Production
 
@@ -222,9 +222,9 @@ The `supabase/_shared/` folder contains reusable functions for text extraction:
 
 Full API documentation is available at `/api-docs` when the server is running.
 
-- Swagger UI: `http://localhost:4000/api-docs`
-- OpenAPI JSON: `http://localhost:4000/api-docs.json`
-- Health check: `http://localhost:4000/health`
+- Swagger UI: `https://resume-checker.fly.dev/api-docs`
+- OpenAPI JSON: `https://resume-checker.fly.dev/api-docs.json`
+- Health check: `https://resume-checker.fly.dev/health`
 
 ## Configuration
 
