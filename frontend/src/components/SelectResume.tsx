@@ -1,8 +1,14 @@
-import { Label } from '@radix-ui/react-label'
-import { FileText } from 'lucide-react'
-import React from 'react'
+import { Label } from "@radix-ui/react-label";
+import { FileText } from "lucide-react";
+import React from "react";
 import { Resume } from "@/api/models/resume";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 type SelectResumeProps = {
   resumes: Resume[];
@@ -17,7 +23,7 @@ function SelectResume({
   isLoading,
   isError,
   selectedResume,
-  setSelectedResume
+  setSelectedResume,
 }: SelectResumeProps) {
   return (
     <div className="space-y-2">
@@ -31,28 +37,41 @@ function SelectResume({
         disabled={isLoading || isError || resumes.length === 0}
       >
         <SelectTrigger>
-          <SelectValue 
+          <SelectValue
             placeholder={
-              isLoading ? "Loading resumes..." : 
-              isError ? "Error loading resumes" : 
-              "Select a resume to analyze"
-            } 
+              isLoading
+                ? "Loading resumes..."
+                : isError
+                  ? "Error loading resumes"
+                  : "Select a resume to analyze"
+            }
           />
         </SelectTrigger>
         {resumes.length > 0 ? (
           <SelectContent>
-            {resumes.map((resume) => (
-              <SelectItem key={resume.id} value={resume.id || ""}>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  {resume.name}
-                </div>
-              </SelectItem>
-            ))}
+            {resumes.map((resume) => {
+              const displayText = resume.name || "";
+              const truncatedText =
+                displayText.length > 26
+                  ? displayText.slice(0, 22) + "..." + ".pdf"
+                  : displayText;
+
+              return (
+                <SelectItem key={resume.id} value={resume.id || ""}>
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 flex-shrink-0" />
+                    <span className="md:hidden">{truncatedText}</span>
+                    <span className="hidden md:inline">{displayText}</span>
+                  </div>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         ) : (
           <SelectContent>
-            <SelectItem value="no-resumes" disabled>No resumes available</SelectItem>
+            <SelectItem value="no-resumes" disabled>
+              No resumes available
+            </SelectItem>
           </SelectContent>
         )}
       </Select>
@@ -60,4 +79,4 @@ function SelectResume({
   );
 }
 
-export default SelectResume
+export default SelectResume;

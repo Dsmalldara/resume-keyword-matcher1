@@ -12,7 +12,6 @@ export const useFetchResumes = () => {
   return useQuery({
     queryKey: [queryKeys.resume, "all"],
     queryFn: () => getResumeListGetResume({ perPage: 1000 }),
-    refetchOnMount: true,
   });
 };
 
@@ -27,6 +26,6 @@ export const useFetchResumesPaginated = (
   return useQuery({
     queryKey: [queryKeys.resume, params],
     queryFn: () => getResumeListGetResume(params),
-    refetchOnMount: true,
+    refetchInterval: 5000,
   });
 };

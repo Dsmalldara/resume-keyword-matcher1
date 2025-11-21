@@ -50,25 +50,28 @@ function SelectAnalysis({
         </SelectTrigger>
         {analysis.length > 0 ? (
           <SelectContent>
-            {analysis.map((analysis) => (
-              <SelectItem
-                key={analysis.id}
-                value={analysis.id || ""}
-                className="flex flex-wrap"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-2">
-                    <Building className="w-4 h-4" />
-                    <span className="flex flex-wrap">
-                      {analysis.jobTitle} at {analysis.jobCompany}
-                    </span>
+            {analysis.map((analysis) => {
+              const displayText = `${analysis.jobTitle} at ${analysis.jobCompany}`;
+              const truncatedText =
+                displayText.length > 26
+                  ? displayText.slice(0, 25) + "..."
+                  : displayText;
+
+              return (
+                <SelectItem key={analysis.id} value={analysis.id || ""}>
+                  <div className="flex items-center justify-between w-full gap-2">
+                    <div className="flex items-center gap-2">
+                      <Building className="w-4 h-4 flex-shrink-0" />
+                      <span className="md:hidden">{truncatedText}</span>
+                      <span className="hidden md:inline">{displayText}</span>
+                    </div>
+                    <Badge variant="outline" className="text-xs flex-shrink-0">
+                      {analysis.matchScore}% match
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="ml-2 text-xs">
-                    {analysis.matchScore}% match
-                  </Badge>
-                </div>
-              </SelectItem>
-            ))}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         ) : (
           <SelectContent>
