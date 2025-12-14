@@ -19,27 +19,39 @@ import { motion } from "framer-motion";
 const features = [
   {
     icon: BarChart3,
-    title: "Intelligent Analysis",
+    title: "Match Score Analysis",
     description:
-      "AI-powered resume analysis that identifies keyword matches and optimization opportunities",
+      "Get real-time matching percentage with detailed breakdown against job descriptions",
   },
   {
     icon: Target,
-    title: "Job Matching",
+    title: "Keyword Insights",
     description:
-      "Match your resume against job descriptions to maximize your chances of landing interviews",
+      "Discover missing and recommended keywords for better ATS compatibility and relevance",
   },
   {
     icon: Zap,
-    title: "Quick Processing",
+    title: "Resume Management",
     description:
-      "Upload and analyze resumes instantly with our lightning-fast processing engine",
+      "Store multiple resumes with version tracking and organize your job application history",
   },
   {
     icon: Star,
-    title: "Cover Letters",
+    title: "AI Cover Letters",
     description:
-      "Generate tailored cover letters that complement your resume for each job application",
+      "Generate customized cover letters tailored to each job description with one click",
+  },
+  {
+    icon: Users,
+    title: "Performance Analytics",
+    description:
+      "Track resume performance metrics and trends across multiple job applications",
+  },
+  {
+    icon: ArrowUpRight,
+    title: "Resume History",
+    description:
+      "View and compare analysis history to optimize your application strategy over time",
   },
 ];
 
@@ -216,21 +228,21 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full border border-primary/20 bg-primary/5">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
             <span className="text-sm text-foreground/80">
-              Trusted by job seekers everywhere
+              Beat the ATS and land your dream job
             </span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6">
-            Stand Out in Every{" "}
+            Optimize Your Resume,{" "}
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Application
+              Match Jobs Better
             </span>
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-            Use AI-powered analysis to optimize your resume, match it with job
-            descriptions, and land your dream job. Increase your interview
-            chances with data-driven insights.
+            Analyze your resume against job descriptions, discover missing
+            keywords, get instant match scores, and generate AI-powered cover
+            letters. Everything you need to stand out to hiring managers.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -328,12 +340,12 @@ export default function LandingPage() {
               Powerful Features
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to craft the perfect application and land your
-              next opportunity
+              Everything you need to optimize your resume and maximize your job
+              search success
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
