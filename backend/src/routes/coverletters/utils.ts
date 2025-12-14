@@ -1,28 +1,30 @@
 import { JsonValue } from "@prisma/client/runtime/library";
-import { gemini } from "../../lib/ai";
+import { chatGPT, gemini } from "../../lib/ai";
 import { generateText } from "ai";
 import logger from "../../../utils/logger";
 
-
 export type coverLetterInfo = {
-    jobTitle: string;
-    jobDescription: string;
-    customNotes: any;
-    strengths: string[];
-    resumeDetails: {
-        candidateName:string,
-        skills: JsonValue;
-        experiences: JsonValue;
-        rawText: string;
-    };
-}
+  jobTitle: string;
+  jobDescription: string;
+  customNotes: any;
+  strengths: string[];
+  resumeDetails: {
+    candidateName: string;
+    skills: JsonValue;
+    experiences: JsonValue;
+    rawText: string;
+  };
+};
 
 // Retry mechanism for generation errors
-const generateWithRetry = async (prompt: string, retries: number = 2): Promise<string> => {
+const generateWithRetry = async (
+  prompt: string,
+  retries: number = 2,
+): Promise<string> => {
   for (let i = 0; i < retries; i++) {
     try {
       const result = await generateText({
-        model: gemini('gemini-2.5-pro'),
+        model: chatGPT("openai/gpt-oss-120b"),
         prompt,
         temperature: 0.2,
         maxOutputTokens: 2500,
@@ -33,57 +35,60 @@ const generateWithRetry = async (prompt: string, retries: number = 2): Promise<s
         throw new Error();
       }
 
-      return text;    
+      return text;
     } catch (error) {
       if (i === retries - 1) {
-  const err = new Error("Max retries reached");
-  (err as any).cause = error;
-  throw err;
-}
+        const err = new Error("Max retries reached");
+        (err as any).cause = error;
+        throw err;
+      }
 
       const delay = 1000 * Math.pow(2, i); // Exponential backoff: 1s, 2s, 4s, ...
-      logger.warn(`Generation attempt ${i + 1} failed, retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      logger.warn(
+        `Generation attempt ${i + 1} failed, retrying in ${delay}ms...`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 
   throw new Error("Unexpected error in generateWithRetry"); // fallback
 };
 
-
-
 export const generateCoverLetter = async (data: coverLetterInfo) => {
-      if (!data.jobTitle || !data.jobDescription) {
-        throw new Error("Missing required fields: jobTitle and jobDescription are mandatory");
-    }
-    const startTime = Date.now()
+  if (!data.jobTitle || !data.jobDescription) {
+    throw new Error(
+      "Missing required fields: jobTitle and jobDescription are mandatory",
+    );
+  }
+  const startTime = Date.now();
 
+  // Build dynamic sections
+  const sections = {
+    candidateName: `CANDIDATE NAME: ${data.resumeDetails.candidateName}`,
+    job: `JOB TITLE: ${data.jobTitle}\n\nJOB DESCRIPTION:\n${data.jobDescription}`,
 
-    // Build dynamic sections
-    const sections = {
-        candidateName: `CANDIDATE NAME: ${data.resumeDetails.candidateName}`,
-        job: `JOB TITLE: ${data.jobTitle}\n\nJOB DESCRIPTION:\n${data.jobDescription}`,
-        
-        strengths: data.strengths?.length 
-            ? `\n\nCANDIDATE STRENGTHS (analyzed match with job):\n${data.strengths.map(s => `- ${s}`).join('\n')}`
-            : '',
-        
-        skills: `\n\nSKILLS:\n${Array.isArray(data.resumeDetails.skills) 
-            ? data.resumeDetails.skills.join(', ') 
-            : data.resumeDetails.skills}`,
-        
-        experience: `\n\nWORK EXPERIENCE:\n${data.resumeDetails.experiences}`,
-        
-        summary: data.resumeDetails.rawText 
-            ? `\n\nPROFESSIONAL SUMMARY:\n${data.resumeDetails.rawText}`
-            : '',
-        
-        notes: data.customNotes 
-            ? `\n\nSPECIAL INSTRUCTIONS:\n${data.customNotes}`
-            : ''
-    };
+    strengths: data.strengths?.length
+      ? `\n\nCANDIDATE STRENGTHS (analyzed match with job):\n${data.strengths.map((s) => `- ${s}`).join("\n")}`
+      : "",
 
-const prompt = `You are an expert cover letter writer specializing in matching candidates to job opportunities.
+    skills: `\n\nSKILLS:\n${
+      Array.isArray(data.resumeDetails.skills)
+        ? data.resumeDetails.skills.join(", ")
+        : data.resumeDetails.skills
+    }`,
+
+    experience: `\n\nWORK EXPERIENCE:\n${data.resumeDetails.experiences}`,
+
+    summary: data.resumeDetails.rawText
+      ? `\n\nPROFESSIONAL SUMMARY:\n${data.resumeDetails.rawText}`
+      : "",
+
+    notes: data.customNotes
+      ? `\n\nSPECIAL INSTRUCTIONS:\n${data.customNotes}`
+      : "",
+  };
+
+  const prompt = `You are an expert cover letter writer specializing in matching candidates to job opportunities.
 
 TASK: Write a compelling, professional cover letter for this job application.
 
@@ -161,18 +166,16 @@ Write a complete, properly formatted cover letter including:
 
 OUTPUT: Begin writing the complete cover letter now.`;
 
-
-try{
-   const result = await generateWithRetry(prompt, 2);
-    const endTime = Date.now()
-    logger.info(`Cover letter generated in ${(endTime - startTime)/1000} seconds`);
+  try {
+    const result = await generateWithRetry(prompt, 2);
+    const endTime = Date.now();
+    logger.info(
+      `Cover letter generated in ${(endTime - startTime) / 1000} seconds`,
+    );
     logger.info(`name is ${sections.candidateName}`);
     return result;
-
-}
-catch(error){
+  } catch (error) {
     logger.error("Error generating cover letter:", error);
     throw error;
-}
-
-}
+  }
+};
