@@ -37,8 +37,8 @@ export default function AuthSignUpCallback() {
           storeAccessToken(data.session.access_token);
 
           setTimeout(() => {
-            router.push("/");
-          }, 2000);
+            router.push("/Home");
+          }, 500);
         } else {
           throw new Error("No session found. Please try logging in again.");
         }
