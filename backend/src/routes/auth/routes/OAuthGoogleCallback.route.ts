@@ -81,7 +81,7 @@ router.get("/callback", oauthLimiter, async (req: Request, res: Response) => {
 
     // Redirect to client with access token as query param (or use a different method)
     const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
-    const redirectUrl = new URL(`${clientUrl}/home`);
+    const redirectUrl = new URL(`${clientUrl}/Home`);
     redirectUrl.searchParams.set(
       "access_token",
       data.session?.access_token || "",

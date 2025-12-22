@@ -51,7 +51,7 @@ export default function LoginPage() {
         onSuccess: (response) => {
           toast.success("Signed in successfully");
           storeAccessToken(response.access_token || "");
-          setTimeout(() => router.push("/home"), 1000);
+          setTimeout(() => router.push("/Home"), 1000);
         },
         onError: (error) => {
           toast.error(getErrorMessage(error));
