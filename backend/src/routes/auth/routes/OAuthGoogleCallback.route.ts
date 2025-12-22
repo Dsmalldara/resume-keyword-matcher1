@@ -32,62 +32,68 @@
  *               example: http://localhost:3000/dashboard?access_token=xyz
  */
 
-
-
-
-import { Router, Request, Response } from 'express';
-import  { supabase } from '../../../lib/supabase';
-import { type AuthResponse } from '@supabase/supabase-js';
-import {   oauthLimiter } from '../../../middleware/rateLimiter';
-import { createUserProfile } from '../../../../utils/createProfile';
+import { Router, Request, Response } from "express";
+import { supabase } from "../../../lib/supabase";
+import { type AuthResponse } from "@supabase/supabase-js";
+import { oauthLimiter } from "../../../middleware/rateLimiter";
+import { createUserProfile } from "../../../../utils/createProfile";
 import logger from "../../../../utils/logger";
 
 const router = Router();
 
-
-router.get('/callback', oauthLimiter, async (req: Request, res: Response) => {
+router.get("/callback", oauthLimiter, async (req: Request, res: Response) => {
   const { code, error: oauthError } = req.query;
 
   if (oauthError) {
-    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/login?error=${oauthError}`);
+    return res.redirect(
+      `${process.env.CLIENT_URL || "http://localhost:3000"}/login?error=${oauthError}`,
+    );
   }
 
   if (!code) {
-    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/login?error=no_code`);
+    return res.redirect(
+      `${process.env.CLIENT_URL || "http://localhost:3000"}/login?error=no_code`,
+    );
   }
 
   try {
     // Exchange code for session
-    const { data, error }: AuthResponse = await supabase.auth.exchangeCodeForSession(code as string);
+    const { data, error }: AuthResponse =
+      await supabase.auth.exchangeCodeForSession(code as string);
 
     if (error) throw error;
 
     // Create profile for OAuth user
-  if (data.user) {
-    try {
-      await createUserProfile(data.user);
-    } catch (profileError) {
-      logger.error('Profile creation failed', { profileError });
+    if (data.user) {
+      try {
+        await createUserProfile(data.user);
+      } catch (profileError) {
+        logger.error("Profile creation failed", { profileError });
+      }
     }
-  }
     // Set refresh token in httpOnly cookie
-    res.cookie('refresh_token', data.session?.refresh_token, {
+    res.cookie("refresh_token", data.session?.refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     // Redirect to client with access token as query param (or use a different method)
-    const redirectUrl = new URL(`${process.env.CLIENT_URL || 'http://localhost:3000'}/dashboard`);
-    redirectUrl.searchParams.set('access_token', data.session?.access_token || '');
-    
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+    const redirectUrl = new URL(`${clientUrl}/home`);
+    redirectUrl.searchParams.set(
+      "access_token",
+      data.session?.access_token || "",
+    );
+
     res.redirect(redirectUrl.toString());
   } catch (error: any) {
-    logger.error('Error exchanging code for session', { error });
-    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/login?error=${error.message}`);
+    logger.error("Error exchanging code for session", { error });
+    res.redirect(
+      `${process.env.CLIENT_URL || "http://localhost:3000"}/login?error=${error.message}`,
+    );
   }
 });
 
-
-export default router
+export default router;
