@@ -1,24 +1,30 @@
-import { Brain, FileText, Target } from "lucide-react";
 import React from "react";
 
 /**
- * Modern Auth Component Library
- * Clean, startup-grade design system for authentication pages
- * Serves as single source of truth for login/signup UI
+ * Editorial Auth Component Library
+ * Magazine-inspired design system for authentication pages.
+ * Drop-in replacements for the previous modern-auth template —
+ * all exports and prop signatures preserved.
  */
+
+const serif = { fontFamily: "'Cormorant Garamond', 'Times New Roman', serif" };
 
 /* ==================== Container & Layout ==================== */
 
 export const AuthContainer = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-blue-50 flex flex-col lg:flex-row w-full">
+  <div className="min-h-screen w-full bg-[#f8f3ea] dark:bg-background text-foreground flex flex-col lg:flex-row">
     {children}
   </div>
 );
 
 export const AuthSidebar = ({ children }: { children: React.ReactNode }) => (
-  <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-900 via-blue-900 to-blue-800 text-white flex-col justify-between p-12">
-    {children}
-  </div>
+  <aside className="hidden lg:flex lg:w-[42%] xl:w-[40%] bg-[#1a1814] text-[#f3ebd9] flex-col p-12 xl:p-16 relative overflow-hidden">
+    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-[#f3ebd9]/55 pb-6 border-b border-[#f3ebd9]/15">
+      <span>Resume Matcher</span>
+      <span>Vol. I · No. 04 · Spring 2026</span>
+    </div>
+    <div className="flex-1 flex flex-col justify-between pt-10">{children}</div>
+  </aside>
 );
 
 export const AuthFormSection = ({
@@ -26,9 +32,9 @@ export const AuthFormSection = ({
 }: {
   children: React.ReactNode;
 }) => (
-  <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 lg:p-8 min-h-screen lg:min-h-auto">
+  <main className="w-full lg:w-[58%] xl:w-[60%] flex flex-col items-center justify-center px-6 py-16 lg:py-20 min-h-screen lg:min-h-0">
     {children}
-  </div>
+  </main>
 );
 
 export const AuthMobileHeader = ({
@@ -38,18 +44,22 @@ export const AuthMobileHeader = ({
   title: string;
   subtitle: string;
 }) => (
-  <div className="w-full max-w-md lg:hidden mb-8">
+  <div className="w-full max-w-md lg:hidden mb-10">
+    <p className="text-[10px] uppercase tracking-[0.3em] text-foreground/55 mb-4">
+      Resume Matcher · Vol. I
+    </p>
     <h1
-      className="text-6xl font-black tracking-tight mb-2 bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent"
-      style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontWeight: "900",
-        letterSpacing: "-0.02em",
-      }}
+      style={serif}
+      className="text-5xl font-semibold leading-[0.95] tracking-tight"
     >
       {title}
     </h1>
-    <p className="text-blue-600 text-sm font-semibold mt-2">{subtitle}</p>
+    <p
+      style={serif}
+      className="text-lg italic text-foreground/70 mt-3 leading-snug"
+    >
+      {subtitle}
+    </p>
   </div>
 );
 
@@ -62,19 +72,19 @@ export const AuthFormContainer = ({
 /* ==================== Typography & Headers ==================== */
 
 export const AuthBrandHeader = ({ title }: { title: string }) => (
-  <div className="my-6">
+  <div className="mb-12">
+    <p className="text-[10px] uppercase tracking-[0.32em] text-[#f3ebd9]/55 mb-5">
+      Cover Feature
+    </p>
     <h1
-      className="text-6xl font-black tracking-tight mb-2 text-white"
-      style={{
-        fontFamily: "'Playfair Display', serif",
-        fontWeight: "900",
-        letterSpacing: "-0.02em",
-      }}
+      style={serif}
+      className="text-5xl xl:text-6xl font-semibold leading-[0.95] tracking-tight"
     >
       {title}
     </h1>
   </div>
 );
+
 export const AuthPageHeader = ({
   title,
   subtitle,
@@ -83,21 +93,16 @@ export const AuthPageHeader = ({
   subtitle: string;
 }) => (
   <div className="mb-10">
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <div className="h-px w-12 bg-foreground mb-7" />
     <h2
-      className="text-4xl font-bold my-6"
-      style={{
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
-        letterSpacing: "-0.025em",
-      }}
+      style={serif}
+      className="text-4xl md:text-5xl lg:text-6xl font-medium leading-[0.95] tracking-tight"
     >
       {title}
     </h2>
-
-    <p className="text-slate-600 font-medium text-base">{subtitle}</p>
+    <p className="text-foreground/65 mt-5 text-base leading-[1.7] max-w-sm">
+      {subtitle}
+    </p>
   </div>
 );
 
@@ -105,45 +110,40 @@ export const AuthPageHeader = ({
 
 export const ValuePropSection = ({
   items,
-  icon,
 }: {
   items: Array<{ title: string; description: string }>;
-  icon?: React.ComponentType<any>[];
-}) => {
-  const icons = [Brain, Target, FileText];
-
-  return (
-    <div className="grid gap-6 md:gap-8">
-      {items.map((item, idx) => {
-        const Icon = icons[idx % icons.length];
-        return (
-          <div
-            key={idx}
-            className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02]"
+}) => (
+  <ol className="divide-y divide-[#f3ebd9]/15 border-y border-[#f3ebd9]/15">
+    {items.map((item, idx) => (
+      <li key={idx} className="py-6 flex items-baseline gap-5">
+        <span
+          style={serif}
+          className="text-xl text-[#f3ebd9]/40 w-10 shrink-0 tabular-nums"
+        >
+          {String(idx + 1).padStart(2, "0")}
+        </span>
+        <div className="flex-1">
+          <h3
+            style={serif}
+            className="text-2xl xl:text-3xl font-medium leading-tight text-[#f3ebd9]"
           >
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <Icon className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-xl font-semibold mb-2 text-white tracking-tight">
-                  {item.title}
-                </h3>
-                <p className="text-blue-100/90 leading-relaxed text-[15px]">
-                  {item.description}
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+            {item.title}
+          </h3>
+          <p className="text-sm text-[#f3ebd9]/70 mt-2 leading-[1.65]">
+            {item.description}
+          </p>
+        </div>
+      </li>
+    ))}
+  </ol>
+);
 
 export const SidebarFooter = ({ children }: { children: React.ReactNode }) => (
-  <div className="pt-8 border-t border-blue-700/30">
-    <p className="text-blue-100 text-sm leading-relaxed font-medium">
+  <div className="pt-10 mt-10 border-t border-[#f3ebd9]/15">
+    <p
+      style={serif}
+      className="text-lg xl:text-xl italic text-[#f3ebd9]/75 leading-snug"
+    >
       {children}
     </p>
   </div>
@@ -156,24 +156,29 @@ export type AuthInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
 };
 
-export const AuthInput = ({ label, error, ...props }: AuthInputProps) => {
-  return (
-    <div>
-      <label className="block text-sm font-semibold text-slate-900 mb-2">
-        {label}
-      </label>
-      <input
-        className={`w-full px-4 py-3 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 text-base ${
-          error
-            ? "border-red-300 bg-red-50 focus:ring-red-500"
-            : "border-slate-200 bg-white focus:ring-slate-900"
-        }`}
-        {...props}
-      />
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-    </div>
-  );
-};
+export const AuthInput = ({ label, error, ...props }: AuthInputProps) => (
+  <div>
+    <label className="block text-[10px] uppercase tracking-[0.28em] text-foreground/70 mb-3">
+      {label}
+    </label>
+    <input
+      className={`w-full px-0 py-3 bg-transparent border-0 border-b text-base focus:outline-none focus:ring-0 transition-colors placeholder:text-foreground/35 ${
+        error
+          ? "border-destructive/70 focus:border-destructive"
+          : "border-foreground/25 focus:border-foreground"
+      }`}
+      {...props}
+    />
+    {error && (
+      <p
+        style={serif}
+        className="mt-2 text-sm italic text-destructive"
+      >
+        {error}
+      </p>
+    )}
+  </div>
+);
 
 export const PasswordInput = ({
   label,
@@ -184,40 +189,47 @@ export const PasswordInput = ({
 }: AuthInputProps & {
   showPassword: boolean;
   onTogglePassword: () => void;
-}) => {
-  return (
-    <div>
-      <label className="block text-sm font-semibold text-slate-900 mb-2">
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          type={showPassword ? "text" : "password"}
-          className={`w-full px-4 py-3 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0 text-base ${
-            error
-              ? "border-red-300 bg-red-50 focus:ring-red-500"
-              : "border-slate-200 bg-white focus:ring-slate-900"
-          }`}
-          {...props}
-        />
-        <button
-          type="button"
-          onClick={onTogglePassword}
-          className="absolute right-3 top-3 text-slate-500 hover:text-slate-700 text-sm font-medium"
-        >
-          {showPassword ? "Hide" : "Show"}
-        </button>
-      </div>
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+}) => (
+  <div>
+    <label className="block text-[10px] uppercase tracking-[0.28em] text-foreground/70 mb-3">
+      {label}
+    </label>
+    <div className="relative">
+      <input
+        type={showPassword ? "text" : "password"}
+        className={`w-full px-0 py-3 pr-16 bg-transparent border-0 border-b text-base focus:outline-none focus:ring-0 transition-colors placeholder:text-foreground/35 ${
+          error
+            ? "border-destructive/70 focus:border-destructive"
+            : "border-foreground/25 focus:border-foreground"
+        }`}
+        {...props}
+      />
+      <button
+        type="button"
+        onClick={onTogglePassword}
+        className="absolute right-0 top-3 text-[10px] uppercase tracking-[0.28em] text-foreground/55 hover:text-foreground transition-colors"
+      >
+        {showPassword ? "Hide" : "Show"}
+      </button>
     </div>
-  );
-};
+    {error && (
+      <p
+        style={serif}
+        className="mt-2 text-sm italic text-destructive"
+      >
+        {error}
+      </p>
+    )}
+  </div>
+);
 
 export const TermsDisclaimer = ({
   children,
 }: {
   children: React.ReactNode;
-}) => <p className="text-xs text-slate-500 font-light">{children}</p>;
+}) => (
+  <p className="text-[11px] text-foreground/55 leading-relaxed">{children}</p>
+);
 
 /* ==================== Buttons ==================== */
 
@@ -233,10 +245,10 @@ export const AuthSubmitButton = ({
   <button
     type="submit"
     disabled={disabled || isLoading}
-    className="w-full py-3 px-4 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed mt-8"
+    className="w-full py-4 bg-foreground text-background text-[10px] uppercase tracking-[0.28em] rounded-none hover:bg-foreground/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-10"
     {...props}
   >
-    {isLoading ? "Loading..." : text}
+    {isLoading ? "Working…" : text}
   </button>
 );
 
@@ -246,7 +258,8 @@ export const GoogleAuthButton = React.forwardRef<
 >(({ children, ...props }, ref) => (
   <button
     ref={ref}
-    className="w-full py-3 px-4 border border-slate-200 text-slate-900 font-semibold rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+    type="button"
+    className="w-full py-4 border border-foreground/25 text-foreground text-[10px] uppercase tracking-[0.28em] rounded-none hover:border-foreground hover:bg-foreground/3 transition-colors flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
     {...props}
   >
     {children}
@@ -257,10 +270,12 @@ GoogleAuthButton.displayName = "GoogleAuthButton";
 /* ==================== Dividers & Separators ==================== */
 
 export const AuthDivider = () => (
-  <div className="flex items-center gap-3 my-8">
-    <div className="flex-1 h-px bg-slate-200"></div>
-    <span className="text-sm text-slate-500">Or</span>
-    <div className="flex-1 h-px bg-slate-200"></div>
+  <div className="flex items-center gap-4 my-10">
+    <div className="flex-1 h-px bg-foreground/20" />
+    <span className="text-[10px] uppercase tracking-[0.32em] text-foreground/55">
+      Or
+    </span>
+    <div className="flex-1 h-px bg-foreground/20" />
   </div>
 );
 
@@ -283,13 +298,15 @@ export const AuthNavLink = ({
 }) => {
   const Link = LinkComponent;
   return (
-    <p className="text-center text-slate-600 mt-8">
+    <p className="text-center text-sm text-foreground/65 mt-10">
       {text}
       <Link
         href={href}
-        className="ml-1 text-slate-900 font-semibold hover:underline"
+        className="ml-2 text-foreground underline underline-offset-4 decoration-foreground/40 hover:decoration-foreground"
       >
-        {linkText}
+        <span style={serif} className="italic font-medium text-base">
+          {linkText}
+        </span>
       </Link>
     </p>
   );
@@ -304,8 +321,8 @@ export const VerificationContainer = ({
 }) => (
   <div className="w-full max-w-md">
     <div className="text-center mb-10">
-      <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-full mb-6">
-        <span className="text-3xl">→</span>
+      <div className="mb-8 flex justify-center">
+        <div className="h-px w-16 bg-foreground" />
       </div>
       {children}
     </div>
@@ -320,42 +337,53 @@ export const VerificationHeader = ({
   subtitle: string;
 }) => (
   <>
+    <p className="text-[10px] uppercase tracking-[0.3em] text-foreground/55 mb-5">
+      Awaiting confirmation
+    </p>
     <h2
-      className="text-3xl lg:text-4xl font-bold text-slate-900 mb-2"
-      style={{
-        fontFamily: "system-ui, -apple-system, sans-serif",
-        fontWeight: "700",
-        letterSpacing: "-0.01em",
-      }}
+      style={serif}
+      className="text-4xl md:text-5xl font-medium leading-none tracking-tight mb-5"
     >
       {title}
     </h2>
-    <p className="text-slate-600 font-light">{subtitle}</p>
+    <p className="text-foreground/65 leading-[1.7]">{subtitle}</p>
   </>
 );
 
 export const EmailDisplay = ({ email }: { email: string }) => (
-  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-8 text-center">
-    <p className="text-sm text-slate-600 mb-1">Verification sent to</p>
-    <p className="text-lg font-semibold text-slate-900 break-all">{email}</p>
+  <div className="border-y border-foreground/15 py-6 mb-10">
+    <p className="text-[10px] uppercase tracking-[0.3em] text-foreground/55 mb-2">
+      Verification sent to
+    </p>
+    <p
+      style={serif}
+      className="text-2xl md:text-3xl italic font-medium break-all"
+    >
+      {email}
+    </p>
   </div>
 );
 
 export const VerificationSteps = ({ steps }: { steps: string[] }) => (
-  <div className="space-y-6 mb-8">
-    <div>
-      <h3 className="font-semibold text-slate-900 mb-4">What's next:</h3>
-      <ol className="space-y-3">
-        {steps.map((step, idx) => (
-          <li key={idx} className="flex gap-3">
-            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-900 text-white text-sm flex items-center justify-center font-semibold">
-              {idx + 1}
-            </span>
-            <span className="text-slate-700">{step}</span>
-          </li>
-        ))}
-      </ol>
-    </div>
+  <div className="mb-10 text-left">
+    <p className="text-[10px] uppercase tracking-[0.3em] text-foreground/55 mb-5">
+      What&rsquo;s next
+    </p>
+    <ol className="divide-y divide-foreground/15 border-y border-foreground/15">
+      {steps.map((step, idx) => (
+        <li key={idx} className="py-4 flex items-baseline gap-5">
+          <span
+            style={serif}
+            className="text-xl text-foreground/40 w-8 shrink-0 tabular-nums"
+          >
+            {String(idx + 1).padStart(2, "0")}
+          </span>
+          <span className="text-sm leading-[1.65] flex-1 text-foreground/80">
+            {step}
+          </span>
+        </li>
+      ))}
+    </ol>
   </div>
 );
 
@@ -368,14 +396,20 @@ export const InfoBox = ({
   message: string;
   variant?: "info" | "warning";
 }) => {
-  const styles = {
-    info: "bg-blue-50 border-blue-200",
-    warning: "bg-amber-50 border-amber-200",
-  };
+  const accent =
+    variant === "warning"
+      ? "text-amber-700 dark:text-amber-400"
+      : "text-primary";
   return (
-    <div className={`${styles[variant]} border rounded-lg p-4`}>
-      <p className="text-sm text-slate-700">
-        <strong>{title}:</strong> {message}
+    <div className="border border-foreground/15 px-4 py-3.5 text-left bg-background/60">
+      <p className="text-sm text-foreground/80 leading-[1.65]">
+        <strong
+          className={`italic font-medium mr-1 ${accent}`}
+          style={serif}
+        >
+          {title}:
+        </strong>
+        {message}
       </p>
     </div>
   );
@@ -385,7 +419,7 @@ export const InfoBoxContainer = ({
   children,
 }: {
   children: React.ReactNode;
-}) => <div className="space-y-4 mb-8">{children}</div>;
+}) => <div className="space-y-3 mb-10 text-left">{children}</div>;
 
 export const VerificationActionButton = ({
   text,
@@ -404,7 +438,7 @@ export const VerificationActionButton = ({
   return (
     <Link
       href={href}
-      className="block w-full py-3 px-4 bg-slate-900 text-white font-semibold rounded-lg text-center hover:bg-slate-800 transition-colors"
+      className="block w-full py-4 bg-foreground text-background text-[10px] uppercase tracking-[0.28em] text-center hover:bg-foreground/90 transition-colors"
     >
       {text}
     </Link>
